@@ -1,17 +1,34 @@
 package com.example.realestatemanager.model
 
-import android.graphics.Bitmap
+import android.net.Uri
 import java.util.Date
 
 data class EstateModel(
-    private val type: String,
-    private val dollarPrice: Int,
-    private val surface: Int,
-    private val rooms: Int,
-    private val description: String,
-    private val pictures: ArrayList<Bitmap>,    //Ou URI interne
-    private val address: String,
-    private val interestPoints: ArrayList<String>,
-    private val status: String, private val startDate: Date,
-    private val sellDate: Date, private val agentName: String
+    val id: Long? = null,
+    val type: EstateType,//done
+    val dollarPrice: Int,//done
+    val surface: Int,//done
+    val rooms: Triple<Int,Int,Int>,//done
+    val description: String,//done
+    val pictures: ArrayList<Uri>,//done
+    val address: String,//done
+    val interestPoints: ArrayList<String>,//TODO
+    val status: String,//TODO
+    val startDate: Date,//auto
+    val sellDate: Date? = null,//TODO
+    val modifyDate: Date? = null,//auto
+    val agentName: String//auto
 )
+enum class EstateType(val label: String) {
+    FLAT("Flat"),
+    HOUSE("House"),
+    DUPLEX("Duplex"),
+    PENTHOUSE("Penthouse");
+    companion object {
+        private val map = values().associateBy(EstateType::label)
+
+        fun fromLabel(label: String): EstateType {
+            return map[label] ?: throw IllegalArgumentException("Unknown EstateType with label: $label")
+        }
+    }
+}

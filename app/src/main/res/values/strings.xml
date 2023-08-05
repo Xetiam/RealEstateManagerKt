@@ -1,16 +1,6 @@
 <resources>
     <string name="app_name">RealEstateManager</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
-    <string name="nav_header_desc">Navigation header</string>
-    <string name="action_settings">Settings</string>
-
-    <string name="menu_transform">Transform</string>
-    <string name="menu_reflow">Reflow</string>
-    <string name="menu_slideshow">Slideshow</string>
-    <string name="menu_settings">Settings</string>
+    <string name="menu_add_estate">Add an estate</string>
 
     <string name="lorem_ipsum_title">Lorem Ipsum"</string>
     <string name="lorem_ipsum">Lorem Ipsum is simply placeholder text of the printing and
@@ -22,4 +12,13 @@
     <string name="image_view_item_transform_content_description">Represents an image view in the
         item
     </string>
+    <string name="add_estate_rooms_hint">Rooms number :</string>
+    <string name="add_estate_bathrooms_hint">Bathrooms number :</string>
+    <string name="add_estate_bedrooms_hint">Bedrooms number :</string>
+    <string name="add_estate_type_hint">Estate type :</string>
+    <string name="add_estate_description_hint">Estate description</string>
+    <string name="add_estate_price_hint">Estate price</string>
+    <string name="add_estate_surface_hint">Estate surface</string>
+    <string name="add_estate_address_hint">Estate address</string>
+    <string name="add_estate_creation_button">Confirm creation</string>
 </resources>
