@@ -10,7 +10,7 @@ data class EstateModel(
     val surface: Int,//done
     val rooms: Triple<Int,Int,Int>,//done
     val description: String,//done
-    val pictures: ArrayList<Uri>,//done
+    val pictures: ArrayList<Pair<Uri,String>>,//done
     val address: String,//done
     val interestPoints: ArrayList<String>,//TODO
     val status: String,//TODO

@@ -6,4 +6,15 @@
         android:icon="@drawable/baseline_add_24"
         android:title="@string/menu_add_estate"
         app:showAsAction="ifRoom|collapseActionView"/>
+    <item
+        android:id="@+id/estate_modify"
+        android:icon="@drawable/baseline_create_24"
+        android:title="@string/menu_modify_estate"
+        app:showAsAction="ifRoom|collapseActionView"/>
+    <item
+        android:id="@+id/estate_search"
+        android:icon="@drawable/baseline_search_24"
+        android:title="@string/menu_search_estate"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="ifRoom|collapseActionView"/>
 </menu>

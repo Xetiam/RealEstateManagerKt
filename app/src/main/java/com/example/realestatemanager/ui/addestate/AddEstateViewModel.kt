@@ -12,14 +12,17 @@ import java.util.Date
 class AddEstateViewModel :
     ViewModelAbstract<AddEstateState>() {
     private var estateRepository: EstateRepository? = null
-    override fun initialState(): AddEstateState {
-        return AddEstateState.InitialState
-    }
+    private var estatePictureDescriptions = mutableListOf<String>()
 
-    fun createEstate(estateModel: EstateModel, context: Context) {
+    private fun createEstate(estateModel: EstateModel, context: Context) {
         estateRepository = Utils.getEstateRepository(context)
         estateRepository?.insertEstate(estateModel)
     }
+
+    private fun isDescriptionPictureComplete(
+        pictures: ArrayList<Uri>,
+        picturesWithDescription: List<Pair<Uri, String>>
+    ): Boolean = (pictures.size == estatePictureDescriptions.size) && picturesWithDescription.any { it.second.isNotEmpty() }
 
     fun initiateCreation(
         type: EstateType,
@@ -31,9 +34,12 @@ class AddEstateViewModel :
         address: String,
         context: Context
     ) {
-        if(Utils.isAddressValid(address) &&
-            !dollarPrice.isEmpty() &&
-            !surface.isEmpty()){
+        val picturesWithDescription = pictures.zip(estatePictureDescriptions)
+        if (Utils.isAddressValid(address) &&
+            dollarPrice.isNotEmpty() &&
+            surface.isNotEmpty() &&
+            isDescriptionPictureComplete(pictures, picturesWithDescription)
+        ) {
             createEstate(
                 EstateModel(
                     type = type,
@@ -41,7 +47,7 @@ class AddEstateViewModel :
                     surface = surface.toInt(),
                     rooms = rooms,
                     description = description,
-                    pictures = pictures,
+                    pictures = ArrayList(picturesWithDescription),
                     address = address,
                     interestPoints = arrayListOf(),
                     status = "To Sale",
@@ -49,10 +55,32 @@ class AddEstateViewModel :
                     agentName = "Jason Momoa"
                 ), context
             )
+            setState(AddEstateState.EstateCreatedState)
         } else {
-            if(!Utils.isAddressValid(address)) { setState(AddEstateState.WrongFormatAdress) }
-            if(dollarPrice.isEmpty()) { setState(AddEstateState.WrongInputPrice) }
-            if(surface.isEmpty()) { setState(AddEstateState.WrongInputSurface) }
+            if (!Utils.isAddressValid(address)) {
+                setState(AddEstateState.WrongFormatAdress)
+            }
+            if (dollarPrice.isEmpty()) {
+                setState(AddEstateState.WrongInputPrice)
+            }
+            if (surface.isEmpty()) {
+                setState(AddEstateState.WrongInputSurface)
+            }
+            if (isDescriptionPictureComplete(pictures, picturesWithDescription)) {
+                setState(AddEstateState.PictureDescriptionMissingState)
+            }
         }
+    }
+
+    fun addDescriptionOrModify(description: String, position: Int) {
+        if (position > estatePictureDescriptions.size - 1) {
+            estatePictureDescriptions.add(position, description)
+        } else {
+            estatePictureDescriptions[position] = description
+        }
+    }
+
+    override fun initUi() {
+        setState(AddEstateState.InitialState)
     }
 }

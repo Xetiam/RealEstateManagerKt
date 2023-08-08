@@ -159,6 +159,7 @@ class EstateContentProvider : ContentProvider(){
         const val COLUMN_BEDROOMS = "bedrooms"
         const val COLUMN_DESCRIPTION = "description"
         const val COLUMN_PICTURES = "pictures"
+        const val COLUMN_PICTURES_DESCRIPTION = "pictures_description"
         const val COLUMN_ADDRESS = "address"
         const val COLUMN_INTEREST_POINTS = "interest_points"
         const val COLUMN_STATUS = "status"
@@ -185,6 +186,7 @@ class EstateContentProvider : ContentProvider(){
                     "${EstateEntry.COLUMN_BEDROOMS} INTEGER NOT NULL, " +
                     "${EstateEntry.COLUMN_DESCRIPTION} TEXT NOT NULL, " +
                     "${EstateEntry.COLUMN_PICTURES} TEXT NOT NULL, " +
+                    "${EstateEntry.COLUMN_PICTURES_DESCRIPTION} TEXT NOT NULL, " +
                     "${EstateEntry.COLUMN_ADDRESS} TEXT NOT NULL, " +
                     "${EstateEntry.COLUMN_INTEREST_POINTS} TEXT NOT NULL, " +
                     "${EstateEntry.COLUMN_STATUS} TEXT NOT NULL, " +

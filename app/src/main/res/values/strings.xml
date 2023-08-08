@@ -21,4 +21,14 @@
     <string name="add_estate_surface_hint">Estate surface</string>
     <string name="add_estate_address_hint">Estate address</string>
     <string name="add_estate_creation_button">Confirm creation</string>
+    <string name="add_estate_picture_description_warning">Please add a description for each picture</string>
+    <string name="add_estate_creation_success">Creation Success !</string>
+    <string name="add_estate_picture_surface_warning">Veuillez entrer une surface en m² uniquement avec des caractère numérique</string>
+    <string name="add_estate_picture_price_warning">Veuillez entrer un prix en $ uniquement avec des caractère numérique</string>
+    <string name="add_estate_picture_address_warning">Veuillez entrer une adresse valide</string>
+    <string name="main_no_estate_message">Veuillez créer un bien immobilier ou connectez-vous pour accéder aux bien en ligne</string>
+    <string name="menu_modify_estate">Modify an estate</string>
+    <string name="menu_search_estate">Search estates</string>
+    <string name="main_search_button">Apply filter</string>
+    <string name="add_estate_picture_description">Picture description</string>
 </resources>

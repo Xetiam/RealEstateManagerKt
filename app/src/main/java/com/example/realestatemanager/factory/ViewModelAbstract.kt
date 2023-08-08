@@ -14,11 +14,5 @@ abstract class ViewModelAbstract<State : ViewState<*>> : ViewModel() {
     protected fun setState(state: State) {
         _viewState.value = state
     }
-
-    protected fun setError(message: String) {
-        _viewState.value = Error(message) as State
-    }
-
-    // Fonction abstraite pour initialiser l'état initial
-    abstract fun initialState(): State
+    abstract fun initUi()
 }

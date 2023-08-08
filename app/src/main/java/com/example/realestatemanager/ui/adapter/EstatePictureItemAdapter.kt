@@ -1,22 +1,44 @@
 package com.example.realestatemanager.ui.adapter
 
 import android.net.Uri
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.viewpager.widget.PagerAdapter
-import com.example.realestatemanager.R
+import com.example.realestatemanager.databinding.ItemEstatePictureBinding
 
-class EstatePictureItemAdapter(private val imageUris: List<Uri>) : PagerAdapter() {
-
+class EstatePictureItemAdapter(
+    private val imageUris: List<Uri>,
+    private val callback: (String, Int) -> Unit
+) : PagerAdapter() {
+    val descriptions: MutableList<String?> = MutableList(imageUris.size) { null }
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
         val inflater = LayoutInflater.from(container.context)
-        val imageView = inflater.inflate(R.layout.item_estate_picture, container, false) as ImageView
-        imageView.setImageURI(imageUris[position])
-        imageView.scaleType = ImageView.ScaleType.CENTER_CROP
-        container.addView(imageView)
-        return imageView
+        val binding = ItemEstatePictureBinding.inflate(inflater)
+        if(descriptions[position].isNullOrEmpty()){
+            binding.description.setText("")
+        } else {
+            binding.description.setText(descriptions[position])
+        }
+        binding.picture.apply {
+            setImageURI(imageUris[position])
+            scaleType = ImageView.ScaleType.CENTER_CROP
+        }
+        binding.description.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                callback(s.toString(), position)
+                descriptions[position] = s.toString()
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
+        container.addView(binding.root)
+        return binding.root
     }
 
     override fun destroyItem(container: ViewGroup, position: Int, obj: Any) {

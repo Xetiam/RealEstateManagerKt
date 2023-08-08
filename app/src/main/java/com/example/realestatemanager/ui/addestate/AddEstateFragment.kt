@@ -8,17 +8,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Spinner
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.example.realestatemanager.R
 import com.example.realestatemanager.databinding.FragmentAddEstateBinding
 import com.example.realestatemanager.model.EstateType
 import com.example.realestatemanager.ui.adapter.EstatePictureItemAdapter
 
 class AddEstateFragment : Fragment() {
-    private lateinit var binding: FragmentAddEstateBinding
+    private val binding: FragmentAddEstateBinding by lazy { FragmentAddEstateBinding.inflate(layoutInflater) }
     private val viewModel: AddEstateViewModel by viewModels()
     private lateinit var imagePickerLauncher: ActivityResultLauncher<Array<String>>
     private val selectedImageUris = mutableListOf<Uri>()
@@ -30,7 +32,65 @@ class AddEstateFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         super.onCreate(savedInstanceState)
-        binding = FragmentAddEstateBinding.inflate(layoutInflater)
+        viewModel.initUi()
+        viewModel.viewState.observe(requireActivity()) { state ->
+            when (state) {
+                is AddEstateState.LoadingState -> showLoadingState()
+                is AddEstateState.InitialState -> showInitialState()
+                is AddEstateState.WrongFormatAdress -> showAdressWarning()
+                is AddEstateState.WrongInputPrice -> showPriceWarning()
+                is AddEstateState.WrongInputSurface -> showSurfaceWarning()
+                is AddEstateState.PictureDescriptionMissingState -> showPictureDescriptionWarning()
+                is AddEstateState.EstateCreatedState -> showEstateCreatedState()
+            }
+        }
+        return binding.root
+    }
+
+    private fun showEstateCreatedState() {
+        Toast.makeText(
+            requireContext(),
+            getString(R.string.add_estate_creation_success),
+            Toast.LENGTH_LONG
+        ).show()
+        val fragmentManager = requireActivity().supportFragmentManager
+        fragmentManager.beginTransaction().remove(this).commit()
+        parentFragmentManager.setFragmentResult("yourFragmentDestroyedKey", Bundle())
+    }
+
+    private fun showPictureDescriptionWarning() {
+        Toast.makeText(
+            requireContext(),
+            getString(R.string.add_estate_picture_description_warning),
+            Toast.LENGTH_LONG
+        ).show()
+    }
+
+    private fun displayPictures() {
+        binding.gallery.apply {
+            isVisible = true
+            adapter = EstatePictureItemAdapter(selectedImageUris) { description, position ->
+                viewModel.addDescriptionOrModify(description, position)
+            }
+        }
+
+    }
+
+    private fun showSurfaceWarning() {
+        binding.surface.error =
+            getString(R.string.add_estate_picture_surface_warning)
+    }
+
+    private fun showPriceWarning() {
+        binding.price.error =
+            getString(R.string.add_estate_picture_price_warning)
+    }
+
+    private fun showAdressWarning() {
+        binding.address.error = getString(R.string.add_estate_picture_address_warning)
+    }
+
+    private fun showInitialState() {
         imagePickerLauncher =
             registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
                 uris?.let {
@@ -44,42 +104,6 @@ class AddEstateFragment : Fragment() {
         setSpinnerAdapter(binding.rooms, (1..20).toList().map { it.toString() })
         setSpinnerAdapter(binding.bathrooms, (1..20).toList().map { it.toString() })
         setSpinnerAdapter(binding.bedrooms, (1..20).toList().map { it.toString() })
-        viewModel.viewState.observe(requireActivity()) { state ->
-            when (state) {
-                is AddEstateState.LoadingState -> showLoadingState()
-                is AddEstateState.InitialState -> showInitialState()
-                is AddEstateState.WrongFormatAdress -> showAdressWarning()
-                is AddEstateState.WrongInputPrice -> showPriceWarning()
-                is AddEstateState.WrongInputSurface -> showSurfaceWarning()
-            }
-        }
-        return binding.root
-    }
-
-    private fun displayPictures() {
-        binding.gallery.apply {
-            isVisible = true
-            adapter = EstatePictureItemAdapter(selectedImageUris)
-        }
-
-    }
-
-    private fun showSurfaceWarning() {
-        binding.surface.error =
-            "Veuillez entrer une surface en m carré uniquement avec des caractère numérique"
-    }
-
-    private fun showPriceWarning() {
-        binding.price.error =
-            "Veuillez entrer un prix en dollar uniquement avec des caractère numérique"
-    }
-
-    private fun showAdressWarning() {
-        binding.address.error = "Veuillez respecter ce format : n° rue, CODE POSTAL Ville, Pays"
-    }
-
-    private fun showInitialState() {
-        //TODO("Not yet implemented")
     }
 
     private fun showLoadingState() {
@@ -120,7 +144,7 @@ class AddEstateFragment : Fragment() {
             type = IMAGE_MIME_TYPE
             addCategory(Intent.CATEGORY_OPENABLE)
             putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-            imagePickerLauncher.launch(arrayOf(IMAGE_MIME_TYPE)) // Assign the intent to imagePickerLauncher
+            imagePickerLauncher.launch(arrayOf(IMAGE_MIME_TYPE))
         }
     }
 }

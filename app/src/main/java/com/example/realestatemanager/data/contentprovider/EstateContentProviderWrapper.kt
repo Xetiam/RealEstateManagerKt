@@ -1,4 +1,5 @@
 package com.example.realestatemanager.data.contentprovider
+
 import android.content.ContentResolver
 import android.content.ContentValues
 import android.content.Context
@@ -28,7 +29,8 @@ class EstateContentProviderWrapper(private val context: Context) : EstateReposit
             null,
             null,
             null,
-            null)
+            null
+        )
         return parseCursorToEstateList(cursor)
     }
 
@@ -41,13 +43,33 @@ class EstateContentProviderWrapper(private val context: Context) : EstateReposit
         contentValues.put(EstateContentProvider.EstateEntry.COLUMN_BATHROOMS, estate.rooms.second)
         contentValues.put(EstateContentProvider.EstateEntry.COLUMN_BEDROOMS, estate.rooms.third)
         contentValues.put(EstateContentProvider.EstateEntry.COLUMN_DESCRIPTION, estate.description)
-        contentValues.put(EstateContentProvider.EstateEntry.COLUMN_PICTURES, estate.pictures.joinToString(","))
+        contentValues.put(
+            EstateContentProvider.EstateEntry.COLUMN_PICTURES,
+            (estate.pictures.map { it.first }).joinToString(",")
+        )
+        contentValues.put(
+            EstateContentProvider.EstateEntry.COLUMN_PICTURES_DESCRIPTION,
+            (estate.pictures.map { it.second }).joinToString(",")
+        )
+        contentValues.put(
+            EstateContentProvider.EstateEntry.COLUMN_PICTURES_DESCRIPTION,
+            (estate.pictures.map { it.second }).joinToString(","))
+
         contentValues.put(EstateContentProvider.EstateEntry.COLUMN_ADDRESS, estate.address)
-        contentValues.put(EstateContentProvider.EstateEntry.COLUMN_INTEREST_POINTS, estate.interestPoints.joinToString(","))
+        contentValues.put(
+            EstateContentProvider.EstateEntry.COLUMN_INTEREST_POINTS,
+            estate.interestPoints.joinToString(",")
+        )
         contentValues.put(EstateContentProvider.EstateEntry.COLUMN_STATUS, estate.status)
-        contentValues.put(EstateContentProvider.EstateEntry.COLUMN_START_DATE, estate.startDate.time)
+        contentValues.put(
+            EstateContentProvider.EstateEntry.COLUMN_START_DATE,
+            estate.startDate.time
+        )
         contentValues.put(EstateContentProvider.EstateEntry.COLUMN_SELL_DATE, estate.sellDate?.time)
-        contentValues.put(EstateContentProvider.EstateEntry.COLUMN_MODIFY_DATE, estate.modifyDate?.time)
+        contentValues.put(
+            EstateContentProvider.EstateEntry.COLUMN_MODIFY_DATE,
+            estate.modifyDate?.time
+        )
         contentValues.put(EstateContentProvider.EstateEntry.COLUMN_AGENT_NAME, estate.agentName)
         return contentValues
     }
@@ -57,25 +79,44 @@ class EstateContentProviderWrapper(private val context: Context) : EstateReposit
         cursor?.use {
             while (it.moveToNext()) {
                 val id = it.getLong(it.getColumnIndexOrThrow(BaseColumns._ID))
-                val type = it.getString(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_TYPE))
-                val dollarPrice = it.getInt(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_DOLLAR_PRICE))
-                val surface = it.getInt(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_SURFACE))
-                val rooms = it.getInt(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_ROOMS))
-                val bathrooms = it.getInt(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_BATHROOMS))
-                val bedrooms = it.getInt(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_BEDROOMS))
-                val description = it.getString(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_DESCRIPTION))
-                val picturesString = it.getString(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_PICTURES))
+                val type =
+                    it.getString(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_TYPE))
+                val dollarPrice =
+                    it.getInt(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_DOLLAR_PRICE))
+                val surface =
+                    it.getInt(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_SURFACE))
+                val rooms =
+                    it.getInt(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_ROOMS))
+                val bathrooms =
+                    it.getInt(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_BATHROOMS))
+                val bedrooms =
+                    it.getInt(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_BEDROOMS))
+                val description =
+                    it.getString(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_DESCRIPTION))
+                val picturesString =
+                    it.getString(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_PICTURES))
                 val pictures = picturesString.split(",").map { uriString -> Uri.parse(uriString) }
-                val address = it.getString(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_ADDRESS))
-                val interestPointsString = it.getString(it.getColumnIndexOrThrow(
-                    EstateContentProvider.EstateEntry.COLUMN_INTEREST_POINTS
-                ))
+                val picturesDescriptionString =
+                    it.getString(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_PICTURES_DESCRIPTION))
+                val picturesDescription = picturesDescriptionString.split(",")
+                val address =
+                    it.getString(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_ADDRESS))
+                val interestPointsString = it.getString(
+                    it.getColumnIndexOrThrow(
+                        EstateContentProvider.EstateEntry.COLUMN_INTEREST_POINTS
+                    )
+                )
                 val interestPoints = interestPointsString.split(",")
-                val status = it.getString(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_STATUS))
-                val startDate = Date(it.getLong(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_START_DATE)))
-                val sellDate = Date(it.getLong(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_SELL_DATE)))
-                val modifyDate = Date(it.getLong(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_MODIFY_DATE)))
-                val agentName = it.getString(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_AGENT_NAME))
+                val status =
+                    it.getString(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_STATUS))
+                val startDate =
+                    Date(it.getLong(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_START_DATE)))
+                val sellDate =
+                    Date(it.getLong(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_SELL_DATE)))
+                val modifyDate =
+                    Date(it.getLong(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_MODIFY_DATE)))
+                val agentName =
+                    it.getString(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_AGENT_NAME))
 
                 val estate = EstateModel(
                     id,
@@ -84,7 +125,7 @@ class EstateContentProviderWrapper(private val context: Context) : EstateReposit
                     surface,
                     Triple(rooms, bathrooms, bedrooms),
                     description,
-                    pictures.toCollection(ArrayList()),
+                    ArrayList(pictures.zip(picturesDescription)),
                     address,
                     ArrayList(interestPoints),
                     status,

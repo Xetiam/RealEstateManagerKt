@@ -8,4 +8,6 @@ sealed class AddEstateState : ViewState<Nothing>() {
     object WrongFormatAdress : AddEstateState()
     object WrongInputPrice : AddEstateState()
     object WrongInputSurface : AddEstateState()
+    object PictureDescriptionMissingState: AddEstateState()
+    object EstateCreatedState : AddEstateState()
 }
