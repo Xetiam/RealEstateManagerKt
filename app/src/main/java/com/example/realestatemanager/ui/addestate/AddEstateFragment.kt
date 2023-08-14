@@ -1,30 +1,41 @@
 package com.example.realestatemanager.ui.addestate
 
 import android.content.Intent
+import android.content.Intent.ACTION_OPEN_DOCUMENT
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.CheckBox
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.realestatemanager.R
 import com.example.realestatemanager.databinding.FragmentAddEstateBinding
+import com.example.realestatemanager.model.EstateInterestPoint
+import com.example.realestatemanager.model.EstateModel
 import com.example.realestatemanager.model.EstateType
+import com.example.realestatemanager.ui.MainActivity.Companion.ARG_ESTATE_ID
 import com.example.realestatemanager.ui.adapter.EstatePictureItemAdapter
 
 class AddEstateFragment : Fragment() {
-    private val binding: FragmentAddEstateBinding by lazy { FragmentAddEstateBinding.inflate(layoutInflater) }
+    private val binding: FragmentAddEstateBinding by lazy {
+        FragmentAddEstateBinding.inflate(
+            layoutInflater
+        )
+    }
     private val viewModel: AddEstateViewModel by viewModels()
     private lateinit var imagePickerLauncher: ActivityResultLauncher<Array<String>>
     private val selectedImageUris = mutableListOf<Uri>()
     private val IMAGE_MIME_TYPE = "image/*"
+    private var isModifying = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,21 +52,48 @@ class AddEstateFragment : Fragment() {
                 is AddEstateState.WrongInputPrice -> showPriceWarning()
                 is AddEstateState.WrongInputSurface -> showSurfaceWarning()
                 is AddEstateState.PictureDescriptionMissingState -> showPictureDescriptionWarning()
-                is AddEstateState.EstateCreatedState -> showEstateCreatedState()
+                is AddEstateState.EstateCreatedState -> showEstateCreatedState(state.message)
+                is AddEstateState.EstateDataState -> showEstateDataState(state.estate)
             }
         }
         return binding.root
     }
 
-    private fun showEstateCreatedState() {
+    private fun showEstateDataState(estate: EstateModel) {
+        selectedImageUris.addAll(estate.pictures.map { it.first })
+        binding.apply {
+            type.setSelection(estate.type.ordinal)
+            price.setText(estate.dollarPrice.toString())
+            surface.setText(estate.surface.toString())
+            rooms.setSelection(estate.rooms.first - 1)
+            bathrooms.setSelection(estate.rooms.second - 1)
+            bedrooms.setSelection(estate.rooms.third - 1)
+            description.setText(estate.description)
+            address.setText(estate.address)
+            isSold.isChecked = estate.sellDate != null
+            interestPoints.children.forEach {
+                val checkBox = it as CheckBox
+                checkBox.isChecked = estate.interestPoints.contains(
+                    EstateInterestPoint.fromLabel(
+                        checkBox.text.toString()
+                    )
+                )
+            }
+        }
+        binding.isSold.isVisible = true
+        binding.estateCreationButton.text = getString(R.string.add_estate_modification_button)
+        displayPictures(estate.pictures.map { it.second })
+    }
+
+    private fun showEstateCreatedState(message: Int) {
         Toast.makeText(
             requireContext(),
-            getString(R.string.add_estate_creation_success),
+            getString(message),
             Toast.LENGTH_LONG
         ).show()
         val fragmentManager = requireActivity().supportFragmentManager
         fragmentManager.beginTransaction().remove(this).commit()
-        parentFragmentManager.setFragmentResult("yourFragmentDestroyedKey", Bundle())
+        parentFragmentManager.setFragmentResult(ADD_ESTATE_FRAGMENT_KEY, Bundle())
     }
 
     private fun showPictureDescriptionWarning() {
@@ -66,12 +104,13 @@ class AddEstateFragment : Fragment() {
         ).show()
     }
 
-    private fun displayPictures() {
+    private fun displayPictures(descriptions: List<String>? = null) {
         binding.gallery.apply {
             isVisible = true
-            adapter = EstatePictureItemAdapter(selectedImageUris) { description, position ->
-                viewModel.addDescriptionOrModify(description, position)
-            }
+            adapter =
+                EstatePictureItemAdapter(selectedImageUris, descriptions) { description, position ->
+                    viewModel.addDescriptionOrModify(description, position)
+                }
         }
 
     }
@@ -93,6 +132,12 @@ class AddEstateFragment : Fragment() {
     private fun showInitialState() {
         imagePickerLauncher =
             registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
+                uris.map {
+                    requireContext().contentResolver.takePersistableUriPermission(
+                        it,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    )
+                }
                 uris?.let {
                     selectedImageUris.clear()
                     selectedImageUris.addAll(uris)
@@ -104,6 +149,16 @@ class AddEstateFragment : Fragment() {
         setSpinnerAdapter(binding.rooms, (1..20).toList().map { it.toString() })
         setSpinnerAdapter(binding.bathrooms, (1..20).toList().map { it.toString() })
         setSpinnerAdapter(binding.bedrooms, (1..20).toList().map { it.toString() })
+        EstateInterestPoint.values().forEach { option ->
+            val checkBox = CheckBox(requireContext())
+            checkBox.text = option.label
+            checkBox.isChecked = false
+            binding.interestPoints.addView(checkBox)
+        }
+        viewModel.getEstateData(arguments?.getLong(ARG_ESTATE_ID), requireContext())
+        isModifying = (arguments?.getLong(ARG_ESTATE_ID) != null
+                && arguments?.getLong(ARG_ESTATE_ID) != 0L)
+
     }
 
     private fun showLoadingState() {
@@ -134,17 +189,35 @@ class AddEstateFragment : Fragment() {
                 binding.description.text.toString(),
                 ArrayList(selectedImageUris),
                 binding.address.text.toString(),
-                requireContext()
+                ArrayList(
+                    binding.interestPoints.children.filterIsInstance<CheckBox>()
+                        .filter { it.isChecked }
+                        .map { EstateInterestPoint.fromLabel(it.text.toString()) }.toList()
+                ),
+                requireContext(),
+                isModifying,
+                arguments?.getLong(ARG_ESTATE_ID),
+                binding.isSold.isChecked
             )
         }
     }
 
     private fun openImagePicker() {
-        Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+        Intent(ACTION_OPEN_DOCUMENT).apply {
             type = IMAGE_MIME_TYPE
             addCategory(Intent.CATEGORY_OPENABLE)
             putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
             imagePickerLauncher.launch(arrayOf(IMAGE_MIME_TYPE))
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        isModifying = false
+        arguments?.clear()
+    }
+
+    companion object {
+        const val ADD_ESTATE_FRAGMENT_KEY = "AddEstateFragmentDestroyedKey"
     }
 }

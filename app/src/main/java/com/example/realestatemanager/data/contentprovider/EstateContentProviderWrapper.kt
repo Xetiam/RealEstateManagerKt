@@ -7,7 +7,9 @@ import android.database.Cursor
 import android.net.Uri
 import android.provider.BaseColumns
 import com.example.realestatemanager.data.EstateRepository
+import com.example.realestatemanager.model.EstateInterestPoint
 import com.example.realestatemanager.model.EstateModel
+import com.example.realestatemanager.model.EstateStatus
 import com.example.realestatemanager.model.EstateType
 import java.util.Date
 
@@ -34,6 +36,29 @@ class EstateContentProviderWrapper(private val context: Context) : EstateReposit
         return parseCursorToEstateList(cursor)
     }
 
+    override fun getEstateById(estateId: Long): EstateModel {
+        val contentResolver: ContentResolver = context.contentResolver
+        val cursor = contentResolver.query(
+            Uri.withAppendedPath(EstateContentProvider.BASE_CONTENT_URI, "estates/$estateId"),
+            null,
+            null,
+            null,
+            null
+        )
+        return parseCursorToEstateList(cursor).first()
+    }
+
+    override fun updateEstate(estate: EstateModel) {
+        val contentResolver: ContentResolver = context.contentResolver
+        val contentValues = getContentValuesFromEstate(estate)
+        contentResolver.update(
+            Uri.withAppendedPath(EstateContentProvider.BASE_CONTENT_URI, "estates/${estate.id}"),
+            contentValues,
+            null,
+            null
+        )
+    }
+
     private fun getContentValuesFromEstate(estate: EstateModel): ContentValues {
         val contentValues = ContentValues()
         contentValues.put(EstateContentProvider.EstateEntry.COLUMN_TYPE, estate.type.label)
@@ -53,14 +78,15 @@ class EstateContentProviderWrapper(private val context: Context) : EstateReposit
         )
         contentValues.put(
             EstateContentProvider.EstateEntry.COLUMN_PICTURES_DESCRIPTION,
-            (estate.pictures.map { it.second }).joinToString(","))
+            (estate.pictures.map { it.second }).joinToString(",")
+        )
 
         contentValues.put(EstateContentProvider.EstateEntry.COLUMN_ADDRESS, estate.address)
         contentValues.put(
             EstateContentProvider.EstateEntry.COLUMN_INTEREST_POINTS,
-            estate.interestPoints.joinToString(",")
+            estate.interestPoints.map { it.label }.joinToString(",")
         )
-        contentValues.put(EstateContentProvider.EstateEntry.COLUMN_STATUS, estate.status)
+        contentValues.put(EstateContentProvider.EstateEntry.COLUMN_STATUS, estate.status.label)
         contentValues.put(
             EstateContentProvider.EstateEntry.COLUMN_START_DATE,
             estate.startDate.time
@@ -106,15 +132,25 @@ class EstateContentProviderWrapper(private val context: Context) : EstateReposit
                         EstateContentProvider.EstateEntry.COLUMN_INTEREST_POINTS
                     )
                 )
-                val interestPoints = interestPointsString.split(",")
+                val interestPoints = interestPointsString.split(",").map { interestPoint ->
+                    EstateInterestPoint.fromLabel(
+                        interestPoint
+                    )
+                }
                 val status =
                     it.getString(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_STATUS))
                 val startDate =
                     Date(it.getLong(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_START_DATE)))
-                val sellDate =
-                    Date(it.getLong(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_SELL_DATE)))
-                val modifyDate =
-                    Date(it.getLong(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_MODIFY_DATE)))
+                var sellDate: Date? = null
+                if (Date(it.getLong(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_SELL_DATE))) != Date(0)) {
+                    sellDate =
+                        Date(it.getLong(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_SELL_DATE)))
+                }
+                var modifyDate: Date? = null
+                if (Date(it.getLong(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_MODIFY_DATE))) != Date(0)) {
+                    modifyDate =
+                        Date(it.getLong(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_MODIFY_DATE)))
+                }
                 val agentName =
                     it.getString(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_AGENT_NAME))
 
@@ -128,7 +164,7 @@ class EstateContentProviderWrapper(private val context: Context) : EstateReposit
                     ArrayList(pictures.zip(picturesDescription)),
                     address,
                     ArrayList(interestPoints),
-                    status,
+                    EstateStatus.fromLabel(status),
                     startDate,
                     sellDate,
                     modifyDate,

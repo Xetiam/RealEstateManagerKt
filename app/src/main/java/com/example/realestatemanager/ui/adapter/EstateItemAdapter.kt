@@ -1,8 +1,9 @@
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.realestatemanager.R
@@ -10,8 +11,8 @@ import com.example.realestatemanager.databinding.ItemEstateRecyclerBinding
 import com.example.realestatemanager.model.EstateModel
 import com.openclassrooms.realestatemanager.Utils
 
-class EstateItemAdapter(private val estateList: List<EstateModel>) :
-    RecyclerView.Adapter<EstateItemAdapter.EstateViewHolder>() {
+class EstateItemAdapter(private val selectedEstate: Long?, private val callback: (Long?) -> Unit) :
+    ListAdapter<EstateModel, EstateItemAdapter.EstateViewHolder>(EstateDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EstateViewHolder {
         val binding: ItemEstateRecyclerBinding =
@@ -20,29 +21,35 @@ class EstateItemAdapter(private val estateList: List<EstateModel>) :
     }
 
     override fun onBindViewHolder(holder: EstateViewHolder, position: Int) {
-        val estate = estateList[position]
+        val estate = getItem(position)
         holder.bind(estate)
-    }
-
-    override fun getItemCount(): Int {
-        return estateList.size
     }
 
     inner class EstateViewHolder(private val binding: ItemEstateRecyclerBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        private val estatePicture: ImageView = binding.estatePicture
-        private val estateType: TextView = binding.estateType
-        private val estateCity: TextView = binding.estateCity
-        private val estatePrice: TextView = binding.estatePrice
 
         fun bind(estate: EstateModel) {
-            estateType.text = estate.type.label
-            estateCity.text = Utils.extractCityFromAddress(estate.address)
-            estatePrice.text = "$${estate.dollarPrice}"
+            binding.apply {
+                estateType.text = estate.type.label
+                estateCity.text = Utils.extractCityFromAddress(estate.address)
+                estatePrice.text = "$${Utils.formatPriceNumber(estate.dollarPrice)}"
+                if (selectedEstate == estate.id) {
+                    root.setCardBackgroundColor(
+                        ContextCompat.getColor(root.context, R.color.purple_500)
+                    )
+                } else {
+                    root.setCardBackgroundColor(
+                        ContextCompat.getColor(root.context, R.color.white)
+                    )
+                }
+                root.setOnClickListener {
+                    callback(estate.id)
+                }
+                val uri = estate.pictures[0].first
+                loadImageWithGlide(uri)
+            }
 
-            val uri = estate.pictures[0].first
-            loadImageWithGlide(uri)
         }
 
         private fun loadImageWithGlide(uri: Uri) {
@@ -50,7 +57,17 @@ class EstateItemAdapter(private val estateList: List<EstateModel>) :
                 .load(uri)
                 .placeholder(R.drawable.ic_gallery_black_24dp)
                 .centerCrop()
-                .into(estatePicture)
+                .into(binding.estatePicture)
         }
+    }
+}
+
+class EstateDiffCallback : DiffUtil.ItemCallback<EstateModel>() {
+    override fun areItemsTheSame(oldItem: EstateModel, newItem: EstateModel): Boolean {
+        return oldItem.id == newItem.id
+    }
+
+    override fun areContentsTheSame(oldItem: EstateModel, newItem: EstateModel): Boolean {
+        return oldItem == newItem
     }
 }

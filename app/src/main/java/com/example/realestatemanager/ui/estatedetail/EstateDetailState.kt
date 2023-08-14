@@ -7,6 +7,5 @@ sealed class EstateDetailState: ViewState<EstateModel>() {
     object LoadingState : EstateDetailState()
     object InitialState : EstateDetailState()
     data class WithEstateState(val estate: EstateModel) : EstateDetailState()
-    object EstateUpdatedState : EstateDetailState()
-    object EstateDeletedState : EstateDetailState()
+    object WithoutEstateState : EstateDetailState()
 }

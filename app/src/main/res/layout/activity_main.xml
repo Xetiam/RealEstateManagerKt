@@ -7,46 +7,65 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     tools:openDrawer="start">
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-        <com.google.android.material.slider.RangeSlider
-            android:id="@+id/price_slider"
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:labelBehavior="visible"
-            android:layout_marginVertical="@dimen/fab_margin_medium"
-            android:layout_marginHorizontal="@dimen/fab_margin_extra_large"/>
-        <com.google.android.material.slider.RangeSlider
-            android:id="@+id/surface_slider"
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:labelBehavior="visible"
-            android:layout_marginVertical="@dimen/fab_margin_medium"
-            android:layout_marginHorizontal="@dimen/fab_margin_extra_large"/>
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/search_button"
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="@dimen/fab_margin_medium"
-            android:layout_marginHorizontal="@dimen/fab_margin_extra_large"
-            android:text="@string/main_search_button" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/estate_recycler"
+            <LinearLayout
+                android:id="@+id/side_container"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="0.4" />
-
+                android:layout_weight="0.4"
+                android:orientation="vertical">
+                <GridLayout
+                    android:id="@+id/interest_points"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:visibility="gone"
+                    android:columnCount="3"
+                    android:rowCount="2"
+                    android:layout_marginVertical="@dimen/fab_margin_medium"/>
+                <CheckBox
+                    android:id="@+id/sell_date"
+                    android:text="@string/filter_estate_recently_sold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:visibility="gone"/>
+                <com.google.android.material.slider.RangeSlider
+                    android:id="@+id/price_slider"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:labelBehavior="visible"
+                    android:layout_marginVertical="@dimen/fab_margin_medium"
+                    android:layout_marginHorizontal="@dimen/fab_margin_extra_large"/>
+                <com.google.android.material.slider.RangeSlider
+                    android:id="@+id/surface_slider"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:labelBehavior="visible"
+                    android:layout_marginVertical="@dimen/fab_margin_medium"
+                    android:layout_marginHorizontal="@dimen/fab_margin_extra_large"/>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/search_button"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="@dimen/fab_margin_medium"
+                    android:layout_marginHorizontal="@dimen/fab_margin_extra_large"
+                    android:text="@string/main_search_button" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/estate_recycler"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+            </LinearLayout>
             <FrameLayout
                 android:id="@+id/main_frame"
                 android:layout_width="0dp"

@@ -9,4 +9,7 @@ sealed class MainState : ViewState<List<EstateModel>>(){
     object WithoutEstateState : MainState()
     object LoadingState : MainState()
     object InitialState : MainState()
+    object ShowRecyclerState : MainState()
+    object HideRecyclerState : MainState()
+    object ShowDetailFragmentState : MainState()
 }

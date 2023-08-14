@@ -2,6 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
 
     <LinearLayout
@@ -125,7 +126,27 @@
                 android:hint="@string/add_estate_surface_hint"
                 android:inputType="number" />
         </LinearLayout>
-
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:textSize="@dimen/text_size_subtitle"
+            android:text="@string/add_estate_point_of_interest"/>
+        <GridLayout
+            android:id="@+id/interest_points"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:columnCount="3"
+            android:rowCount="2"
+            android:layout_marginVertical="@dimen/fab_margin_medium"/>
+        <CheckBox
+            android:id="@+id/is_sold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:text="@string/add_estate_sold_checkbox"/>
         <Button
             android:id="@+id/estate_creation_button"
             android:layout_width="match_parent"

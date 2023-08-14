@@ -4,12 +4,13 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
-import com.example.realestatemanager.data.contentprovider.EstateContentProviderWrapper
 import com.example.realestatemanager.data.EstateRepository
+import com.example.realestatemanager.data.contentprovider.EstateContentProviderWrapper
 import java.io.IOException
 import java.net.InetSocketAddress
 import java.net.Socket
 import java.text.DateFormat
+import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -54,23 +55,24 @@ object Utils {
      */
     fun isInternetAvailable(context: Context): Boolean {
         val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val capabilities: NetworkCapabilities? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            cm.getNetworkCapabilities(cm.activeNetwork)
-        } else {
-            try {
-                Socket().use { socket ->
-                    socket.connect(InetSocketAddress("www.google.com", 80), 1500)
-                    return true
+        val capabilities: NetworkCapabilities? =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                cm.getNetworkCapabilities(cm.activeNetwork)
+            } else {
+                try {
+                    Socket().use { socket ->
+                        socket.connect(InetSocketAddress("www.google.com", 80), 1500)
+                        return true
+                    }
+                } catch (e: IOException) {
+                    return false
                 }
-            } catch (e: IOException) {
-                return false
             }
-        }
         return capabilities != null && (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
                 capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR))
     }
 
-    fun getEstateRepository(context: Context) : EstateRepository =
+    fun getEstateRepository(context: Context): EstateRepository =
         if (isInternetAvailable(context)) {
             //TODO : En attente du back
             EstateContentProviderWrapper(context)
@@ -84,12 +86,18 @@ object Utils {
     }
 
     fun extractCityFromAddress(address: String): String? {
-        val pattern = Regex("(\\d+)?\\s*([\\w\\s]+),\\s*(\\d{5})\\s*([\\w\\s]+),\\s*([\\w\\s]+)") // Expression régulière pour un format européen générique
+        val pattern =
+            Regex("(\\d+)?\\s*([\\w\\s]+),\\s*(\\d{5})\\s*([\\w\\s]+),\\s*([\\w\\s]+)") // Expression régulière pour un format européen générique
 
         val matchResult = pattern.find(address)
         if (matchResult != null && matchResult.groups.size >= 5) {
             return matchResult.groups[4]?.value?.trim() // Récupère le groupe correspondant à la ville et retire les espaces éventuels autour
         }
         return null // Adresse invalide ou incomplète
+    }
+
+    fun formatPriceNumber(price: Int): String {
+        val dec = DecimalFormat("###,###,###,###,###")
+        return dec.format(price)
     }
 }

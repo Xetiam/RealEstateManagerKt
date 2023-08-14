@@ -6,26 +6,32 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.viewpager.widget.PagerAdapter
+import com.bumptech.glide.Glide
 import com.example.realestatemanager.databinding.ItemEstatePictureBinding
 
 class EstatePictureItemAdapter(
     private val imageUris: List<Uri>,
+    private val descriptionsOld: List<String>?,
     private val callback: (String, Int) -> Unit
 ) : PagerAdapter() {
     val descriptions: MutableList<String?> = MutableList(imageUris.size) { null }
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
         val inflater = LayoutInflater.from(container.context)
         val binding = ItemEstatePictureBinding.inflate(inflater)
-        if(descriptions[position].isNullOrEmpty()){
+        if (descriptions[position].isNullOrEmpty()) {
             binding.description.setText("")
         } else {
             binding.description.setText(descriptions[position])
         }
-        binding.picture.apply {
-            setImageURI(imageUris[position])
-            scaleType = ImageView.ScaleType.CENTER_CROP
+        Glide.with(binding.root.context)
+            .load(imageUris[position])
+            .centerCrop()
+            .into(binding.picture)
+        descriptionsOld?.let {
+            if (descriptionsOld.size > position) {
+                binding.description.setText(descriptionsOld[position])
+            }
         }
         binding.description.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}

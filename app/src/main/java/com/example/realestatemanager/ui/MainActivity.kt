@@ -1,28 +1,40 @@
 package com.example.realestatemanager.ui
 
 import EstateItemAdapter
-import android.content.Intent.ACTION_OPEN_DOCUMENT
+import android.Manifest.permission.READ_EXTERNAL_STORAGE
+import android.Manifest.permission.READ_MEDIA_IMAGES
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.CheckBox
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
+import androidx.core.view.children
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.realestatemanager.R
 import com.example.realestatemanager.databinding.ActivityMainBinding
+import com.example.realestatemanager.model.EstateInterestPoint
 import com.example.realestatemanager.model.EstateModel
 import com.example.realestatemanager.ui.addestate.AddEstateFragment
+import com.example.realestatemanager.ui.addestate.AddEstateFragment.Companion.ADD_ESTATE_FRAGMENT_KEY
+import com.example.realestatemanager.ui.estatedetail.EstateDetailFragment
+import com.google.android.material.slider.RangeSlider
 
 
 class MainActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by viewModels()
     private val binding: ActivityMainBinding by lazy { ActivityMainBinding.inflate(layoutInflater) }
+    private var estateIdCursor: Long? = null
+    private var screenSizeInches: Float = 0f
+    private lateinit var searchView: SearchView
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { _: Boolean ->
@@ -32,6 +44,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        val displayMetrics = resources.displayMetrics
+        val densityDpi = displayMetrics.densityDpi
+        screenSizeInches = displayMetrics.widthPixels.toFloat() / densityDpi.toFloat()
         viewModel.initUi()
         viewModel.viewState.observe(this) { state ->
             when (state) {
@@ -45,7 +60,39 @@ class MainActivity : AppCompatActivity() {
                     state.minSurface,
                     state.maxSurface
                 )
+
+                is MainState.ShowRecyclerState -> showRecyclerState()
+                is MainState.HideRecyclerState -> hideRecyclerState()
+                is MainState.ShowDetailFragmentState -> showDetailFragmentState()
             }
+        }
+    }
+
+    private fun showDetailFragmentState() {
+        viewModel.fragmentTreatment(screenSizeInches)
+        val fragment = EstateDetailFragment()
+        fragment.arguments = Bundle().apply {
+            estateIdCursor?.let { putLong(ARG_ESTATE_ID, it) }
+        }
+        mainFragmentLauncher(fragment)
+    }
+
+    private fun hideRecyclerState() {
+        binding.sideContainer.isVisible = false
+    }
+
+    private fun showRecyclerState() {
+        binding.sideContainer.isVisible = true
+    }
+
+    private fun showInitialState() {
+        checkPermission()
+        setCallBackListener()
+        EstateInterestPoint.values().forEach { option ->
+            val checkBox = CheckBox(this)
+            checkBox.text = option.label
+            checkBox.isChecked = false
+            binding.interestPoints.addView(checkBox)
         }
     }
 
@@ -55,55 +102,71 @@ class MainActivity : AppCompatActivity() {
         minSurface: Int,
         maxSurface: Int
     ) {
+        binding.priceSlider.isVisible = true
+        binding.surfaceSlider.isVisible = true
+        binding.interestPoints.isVisible = true
+        binding.sellDate.isVisible = true
         var selectedPriceMin = minPrice
         var selectedPriceMax = maxPrice
         var selectedSurfaceMin = minSurface
         var selectedSurfaceMax = maxSurface
-        binding.priceSlider.apply {
-
-            isVisible = true
-            valueFrom = minPrice.toFloat()
-            valueTo = maxPrice.toFloat()
-            setValues(minPrice.toFloat(), maxPrice.toFloat())
-            addOnChangeListener { _, _, _ ->
-                selectedPriceMin = values[0].toInt()
-                selectedPriceMax = values[1].toInt()
-            }
+        binding.interestPoints.children.forEach { view ->
+            val checkBox = view as CheckBox
+            checkBox.isChecked = false
         }
-        binding.surfaceSlider.apply {
-            isVisible = true
-            valueFrom = minSurface.toFloat()
-            valueTo = maxSurface.toFloat()
-            setValues(minSurface.toFloat(), maxSurface.toFloat())
-            addOnChangeListener { _, _, _ ->
-                selectedSurfaceMin = values[0].toInt()
-                selectedSurfaceMax = values[1].toInt()
-            }
+        setSlider(binding.priceSlider, minPrice, maxPrice) { pair ->
+            selectedPriceMin = pair.first
+            selectedPriceMax = pair.second
+        }
+        setSlider(binding.surfaceSlider, minSurface, maxSurface) { pair ->
+            selectedSurfaceMin = pair.first
+            selectedSurfaceMax = pair.second
         }
         binding.searchButton.apply {
             isVisible = true
             setOnClickListener {
+                invalidateOptionsMenu()
                 viewModel.onSliderChanged(
                     selectedPriceMin,
                     selectedPriceMax,
                     selectedSurfaceMin,
-                    selectedSurfaceMax
+                    selectedSurfaceMax,
+                    ArrayList(
+                        binding.interestPoints.children.filterIsInstance<CheckBox>()
+                            .filter { it.isChecked }
+                            .map { EstateInterestPoint.fromLabel(it.text.toString()) }.toList()
+                    ),
+                    binding.sellDate.isChecked
                 )
                 isVisible = false
                 binding.priceSlider.isVisible = false
                 binding.surfaceSlider.isVisible = false
+                binding.interestPoints.isVisible = false
+                binding.sellDate.isVisible = false
             }
         }
     }
 
-    private fun showInitialState() {
-        checkPermission()
-        setCallBackListener()
+    private fun setSlider(
+        slider: RangeSlider,
+        min: Int,
+        max: Int,
+        callback: (Pair<Int, Int>) -> Unit
+    ) {
+        slider.apply {
+            isVisible = true
+            valueFrom = min.toFloat()
+            valueTo = max.toFloat()
+            setValues(min.toFloat(), max.toFloat())
+            addOnChangeListener { _, _, _ ->
+                callback(Pair(values[0].toInt(), values[1].toInt()))
+            }
+        }
     }
 
     private fun setCallBackListener() {
         supportFragmentManager.setFragmentResultListener(
-            "yourFragmentDestroyedKey",
+            ADD_ESTATE_FRAGMENT_KEY,
             this
         ) { _, _ ->
             binding.estateRecycler.isVisible = true
@@ -112,12 +175,13 @@ class MainActivity : AppCompatActivity() {
         }
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                if (binding.estateRecycler.isVisible == true) {
+                if (binding.sideContainer.isVisible) {
                     finish()
                 } else {
-                    binding.estateRecycler.isVisible = true
+                    binding.sideContainer.isVisible = true
                     binding.mainFrame.isVisible = false
                     viewModel.loadEstates(this@MainActivity)
+                    supportFragmentManager.beginTransaction().remove(AddEstateFragment()).commit()
                 }
             }
         })
@@ -128,7 +192,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showEstatesState(estates: List<EstateModel>) {
-        val adapter = EstateItemAdapter(estates)
+        val adapter = EstateItemAdapter(estateIdCursor) {
+            viewModel.shouldShowDetailFragment(estateIdCursor == it)
+            estateIdCursor = it
+            viewModel.loadEstates(this)
+        }
+        adapter.submitList(estates)
         binding.estateRecycler.layoutManager = LinearLayoutManager(this)
         binding.estateRecycler.adapter = adapter
     }
@@ -140,7 +209,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkPermission() {
-        val permission = ACTION_OPEN_DOCUMENT
+        var permission = READ_EXTERNAL_STORAGE
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permission = READ_MEDIA_IMAGES
+        }
         if (ContextCompat.checkSelfPermission(
                 this,
                 permission
@@ -160,23 +232,24 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem) =
         when (item.itemId) {
             R.id.estate_add -> {
-                binding.estateRecycler.isVisible = false
-                binding.mainFrame.isVisible = true
-                binding.noEstateMessage.isVisible = false
-                supportFragmentManager.beginTransaction()
-                    .replace(binding.mainFrame.id, AddEstateFragment())
-                    .commit()
+                viewModel.fragmentTreatment(screenSizeInches)
+                mainFragmentLauncher(AddEstateFragment())
                 true
             }
 
             R.id.estate_modify -> {
-
+                val fragment = AddEstateFragment()
+                fragment.arguments = Bundle().apply {
+                    estateIdCursor?.let { putLong(ARG_ESTATE_ID, it) }
+                }
+                viewModel.fragmentTreatment(screenSizeInches)
+                mainFragmentLauncher(fragment)
                 true
             }
 
             R.id.estate_search -> {
                 viewModel.addSurfaceAndPriceCursor()
-                val searchView = item.actionView as SearchView
+                searchView = item.actionView as SearchView
                 searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                     override fun onQueryTextSubmit(query: String?): Boolean = false
                     override fun onQueryTextChange(newText: String?): Boolean {
@@ -191,4 +264,22 @@ class MainActivity : AppCompatActivity() {
                 super.onOptionsItemSelected(item)
             }
         }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        menu?.clear()
+        menuInflater.inflate(R.menu.menu, menu)
+        return super.onPrepareOptionsMenu(menu)
+    }
+
+    private fun mainFragmentLauncher(fragment: Fragment) {
+        binding.noEstateMessage.isVisible = false
+        binding.mainFrame.isVisible = true
+        supportFragmentManager.beginTransaction()
+            .replace(binding.mainFrame.id, fragment)
+            .commit()
+    }
+
+    companion object {
+        const val ARG_ESTATE_ID = "estateId"
+    }
 }
