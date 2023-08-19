@@ -1,6 +1,7 @@
 package com.example.realestatemanager.ui
 
 import android.content.Context
+import com.example.realestatemanager.R
 import com.example.realestatemanager.data.EstateRepository
 import com.example.realestatemanager.factory.ViewModelAbstract
 import com.example.realestatemanager.model.EstateInterestPoint
@@ -18,9 +19,15 @@ class MainViewModel : ViewModelAbstract<MainState>() {
     fun loadEstates(context: Context) {
         if (displayedEstates.isEmpty()) {
             estateRepository = Utils.getEstateRepository(context)
-            estates = ArrayList(estateRepository?.getAllEstates())
+            val fetchedEstate = estateRepository?.getAllEstates()?.let { ArrayList(it) }
+            estates = fetchedEstate ?: ArrayList()
             if (estates.isEmpty()) {
-                setState(MainState.WithoutEstateState)
+                setState(
+                    MainState.WithoutEstateState(
+                        if (Utils.isInternetAvailable(context)) R.string.no_estate_found_with_internet
+                        else R.string.no_estate_without_connexion
+                    )
+                )
             } else {
                 setState(MainState.WithEstatesState(estates))
             }
@@ -82,14 +89,6 @@ class MainViewModel : ViewModelAbstract<MainState>() {
         }
         displayedEstates = filteredEstates
         setState(MainState.WithEstatesState(filteredEstates))
-    }
-
-    fun fragmentTreatment(screenSizeInches: Float) {
-        if (screenSizeInches <= 6) {
-            setState(MainState.HideRecyclerState)
-        } else {
-            setState(MainState.ShowRecyclerState)
-        }
     }
 
     fun shouldShowDetailFragment(isTouchedTwoTimes: Boolean) {

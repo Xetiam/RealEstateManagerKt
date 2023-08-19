@@ -1,6 +1,7 @@
 package com.example.realestatemanager.ui
 
 import EstateItemAdapter
+import NoEstateItemAdapter
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.READ_MEDIA_IMAGES
 import android.content.pm.PackageManager
@@ -24,7 +25,6 @@ import com.example.realestatemanager.databinding.ActivityMainBinding
 import com.example.realestatemanager.model.EstateInterestPoint
 import com.example.realestatemanager.model.EstateModel
 import com.example.realestatemanager.ui.addestate.AddEstateFragment
-import com.example.realestatemanager.ui.addestate.AddEstateFragment.Companion.ADD_ESTATE_FRAGMENT_KEY
 import com.example.realestatemanager.ui.estatedetail.EstateDetailFragment
 import com.google.android.material.slider.RangeSlider
 
@@ -33,7 +33,6 @@ class MainActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by viewModels()
     private val binding: ActivityMainBinding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private var estateIdCursor: Long? = null
-    private var screenSizeInches: Float = 0f
     private lateinit var searchView: SearchView
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -44,16 +43,13 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        val displayMetrics = resources.displayMetrics
-        val densityDpi = displayMetrics.densityDpi
-        screenSizeInches = displayMetrics.widthPixels.toFloat() / densityDpi.toFloat()
         viewModel.initUi()
         viewModel.viewState.observe(this) { state ->
             when (state) {
                 is MainState.InitialState -> showInitialState()
                 is MainState.LoadingState -> showLoadingState()
                 is MainState.WithEstatesState -> showEstatesState(state.estates)
-                is MainState.WithoutEstateState -> showWithoutEstateState()
+                is MainState.WithoutEstateState -> showWithoutEstateState(state.message)
                 is MainState.SliderValuesState -> showSliderValuesState(
                     state.minPrice,
                     state.maxPrice,
@@ -61,28 +57,17 @@ class MainActivity : AppCompatActivity() {
                     state.maxSurface
                 )
 
-                is MainState.ShowRecyclerState -> showRecyclerState()
-                is MainState.HideRecyclerState -> hideRecyclerState()
                 is MainState.ShowDetailFragmentState -> showDetailFragmentState()
             }
         }
     }
 
     private fun showDetailFragmentState() {
-        viewModel.fragmentTreatment(screenSizeInches)
         val fragment = EstateDetailFragment()
         fragment.arguments = Bundle().apply {
             estateIdCursor?.let { putLong(ARG_ESTATE_ID, it) }
         }
         mainFragmentLauncher(fragment)
-    }
-
-    private fun hideRecyclerState() {
-        binding.sideContainer.isVisible = false
-    }
-
-    private fun showRecyclerState() {
-        binding.sideContainer.isVisible = true
     }
 
     private fun showInitialState() {
@@ -165,23 +150,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setCallBackListener() {
-        supportFragmentManager.setFragmentResultListener(
-            ADD_ESTATE_FRAGMENT_KEY,
-            this
-        ) { _, _ ->
-            binding.estateRecycler.isVisible = true
-            binding.mainFrame.isVisible = false
-            viewModel.loadEstates(this@MainActivity)
-        }
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                if (binding.sideContainer.isVisible) {
+                if (!binding.slidingPaneLayout.isOpen) {
                     finish()
                 } else {
-                    binding.sideContainer.isVisible = true
-                    binding.mainFrame.isVisible = false
-                    viewModel.loadEstates(this@MainActivity)
-                    supportFragmentManager.beginTransaction().remove(AddEstateFragment()).commit()
+                    binding.slidingPaneLayout.closePane()
                 }
             }
         })
@@ -202,10 +176,10 @@ class MainActivity : AppCompatActivity() {
         binding.estateRecycler.adapter = adapter
     }
 
-    private fun showWithoutEstateState() {
-        binding.estateRecycler.isVisible = false
-        binding.mainFrame.isVisible = false
-        binding.noEstateMessage.isVisible = true
+    private fun showWithoutEstateState(message: Int) {
+        val adapter = NoEstateItemAdapter(message)
+        binding.estateRecycler.layoutManager = LinearLayoutManager(this)
+        binding.estateRecycler.adapter = adapter
     }
 
     private fun checkPermission() {
@@ -232,7 +206,6 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem) =
         when (item.itemId) {
             R.id.estate_add -> {
-                viewModel.fragmentTreatment(screenSizeInches)
                 mainFragmentLauncher(AddEstateFragment())
                 true
             }
@@ -242,7 +215,6 @@ class MainActivity : AppCompatActivity() {
                 fragment.arguments = Bundle().apply {
                     estateIdCursor?.let { putLong(ARG_ESTATE_ID, it) }
                 }
-                viewModel.fragmentTreatment(screenSizeInches)
                 mainFragmentLauncher(fragment)
                 true
             }
@@ -272,11 +244,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun mainFragmentLauncher(fragment: Fragment) {
-        binding.noEstateMessage.isVisible = false
-        binding.mainFrame.isVisible = true
         supportFragmentManager.beginTransaction()
             .replace(binding.mainFrame.id, fragment)
             .commit()
+        binding.slidingPaneLayout.openPane()
     }
 
     companion object {

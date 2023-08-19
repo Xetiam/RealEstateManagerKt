@@ -37,4 +37,13 @@
     <string name="add_estate_sold_checkbox">Sold</string>
     <string name="add_estate_point_of_interest">Point of interest :</string>
     <string name="filter_estate_recently_sold">Recently sold</string>
+    <string name="no_estate_found_with_internet">No estate found</string>
+    <string name="no_estate_without_connexion">No internet connexion and no estate saved on your device</string>
+    <string name="estate_detail_media">Media</string>
+    <string name="estate_detail_description">Description</string>
+    <string name="estate_detail_surface">Surface</string>
+    <string name="estate_detail_number_of_rooms">Number of rooms</string>
+    <string name="estate_detail_number_of_bathrooms">Number of bathrooms</string>
+    <string name="estate_detail_number_of_bedrooms">Number of bedrooms</string>
+    <string name="estate_detail_location">Location</string>
 </resources>

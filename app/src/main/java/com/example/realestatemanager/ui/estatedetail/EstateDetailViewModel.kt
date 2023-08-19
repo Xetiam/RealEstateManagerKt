@@ -16,8 +16,6 @@ class EstateDetailViewModel : ViewModelAbstract<EstateDetailState>() {
         val estate = estateRepository?.getEstateById(estateId)
         if (estate != null) {
             setState(EstateDetailState.WithEstateState(estate))
-        } else {
-            setState(EstateDetailState.WithoutEstateState)
         }
     }
 }

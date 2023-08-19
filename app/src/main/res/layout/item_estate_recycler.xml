@@ -54,6 +54,7 @@
                 android:layout_weight="1"
                 android:textColor="@color/design_default_color_secondary"
                 android:textSize="@dimen/text_size_title"
+                android:layout_margin="@dimen/fab_margin_medium"
                 android:gravity="center_vertical"
                 tools:text="$17,870,000" />
         </LinearLayout>

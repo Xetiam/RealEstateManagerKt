@@ -93,7 +93,6 @@ class AddEstateFragment : Fragment() {
         ).show()
         val fragmentManager = requireActivity().supportFragmentManager
         fragmentManager.beginTransaction().remove(this).commit()
-        parentFragmentManager.setFragmentResult(ADD_ESTATE_FRAGMENT_KEY, Bundle())
     }
 
     private fun showPictureDescriptionWarning() {
@@ -215,9 +214,5 @@ class AddEstateFragment : Fragment() {
         super.onDestroyView()
         isModifying = false
         arguments?.clear()
-    }
-
-    companion object {
-        const val ADD_ESTATE_FRAGMENT_KEY = "AddEstateFragmentDestroyedKey"
     }
 }

@@ -97,7 +97,7 @@ class AddEstateViewModel :
             if (surface.isEmpty()) {
                 setState(AddEstateState.WrongInputSurface)
             }
-            if (isDescriptionPictureComplete(pictures, picturesWithDescription)) {
+            if (!isDescriptionPictureComplete(pictures, picturesWithDescription)) {
                 setState(AddEstateState.PictureDescriptionMissingState)
             }
         }

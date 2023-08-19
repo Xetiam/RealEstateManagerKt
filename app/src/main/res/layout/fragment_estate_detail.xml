@@ -15,7 +15,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/fab_margin_medium"
-            android:text="Media"
+            android:text="@string/estate_detail_media"
             android:textSize="@dimen/text_size_title" />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -29,7 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/fab_margin_medium"
-            android:text="Description"
+            android:text="@string/estate_detail_description"
             android:textSize="@dimen/text_size_title" />
 
         <TextView
@@ -46,9 +46,8 @@
             android:orientation="horizontal">
 
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
                 android:orientation="vertical">
 
                 <TextView
@@ -57,7 +56,7 @@
                     android:layout_margin="@dimen/fab_margin_medium"
                     android:drawableStart="@drawable/baseline_border_inner_24"
                     android:drawablePadding="@dimen/fab_margin_medium"
-                    android:text="Surface"
+                    android:text="@string/estate_detail_surface"
                     android:textSize="@dimen/text_size_body" />
 
                 <TextView
@@ -74,7 +73,7 @@
                     android:layout_margin="@dimen/fab_margin_medium"
                     android:drawableStart="@drawable/baseline_home_24"
                     android:drawablePadding="@dimen/fab_margin_medium"
-                    android:text="Number of rooms"
+                    android:text="@string/estate_detail_number_of_rooms"
                     android:textSize="@dimen/text_size_body" />
 
                 <TextView
@@ -91,7 +90,7 @@
                     android:layout_margin="@dimen/fab_margin_medium"
                     android:drawableStart="@drawable/baseline_bathtub_24"
                     android:drawablePadding="@dimen/fab_margin_medium"
-                    android:text="Number of bathrooms"
+                    android:text="@string/estate_detail_number_of_bathrooms"
                     android:textSize="@dimen/text_size_body" />
 
                 <TextView
@@ -108,7 +107,7 @@
                     android:layout_margin="@dimen/fab_margin_medium"
                     android:drawableStart="@drawable/baseline_bed_24"
                     android:drawablePadding="@dimen/fab_margin_medium"
-                    android:text="Number of bedrooms"
+                    android:text="@string/estate_detail_number_of_bedrooms"
                     android:textSize="@dimen/text_size_body" />
 
                 <TextView
@@ -119,31 +118,57 @@
                     android:paddingStart="@dimen/fab_margin_extra_large"
                     tools:text="4" />
             </LinearLayout>
+
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical">
-                <TextView
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/fab_margin_medium"
-                    android:text="Location"
-                    android:textSize="@dimen/text_size_body"/>
-                <TextView
-                    android:id="@+id/address"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    tools:text="@string/lorem_ipsum"
-                    android:paddingStart="@dimen/fab_margin_extra_large"/>
-                <GridLayout
-                    android:id="@+id/interest_points"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:columnCount="2"
-                    android:rowCount="3"
-                    android:layout_marginVertical="@dimen/fab_margin_medium"/>
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/fab_margin_medium"
+                            android:text="@string/estate_detail_location"
+                            android:textSize="@dimen/text_size_body" />
+
+                        <TextView
+                            android:id="@+id/address"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/fab_margin_extra_large"
+                            tools:text="@string/lorem_ipsum" />
+                    </LinearLayout>
+
+                    <GridLayout
+                        android:id="@+id/interest_points"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginVertical="@dimen/fab_margin_medium"
+                        android:layout_weight="1"
+                        android:columnCount="2"
+                        android:rowCount="3" />
+                </LinearLayout>
+
+                <FrameLayout
+                    android:id="@+id/map_view"
+                    android:name="com.google.android.gms.maps.SupportMapFragment"
+                    android:layout_width="fill_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_margin="@dimen/fab_margin_medium" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

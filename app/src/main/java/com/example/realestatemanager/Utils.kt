@@ -1,11 +1,14 @@
 package com.openclassrooms.realestatemanager
 
 import android.content.Context
+import android.location.Address
+import android.location.Geocoder
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import com.example.realestatemanager.data.EstateRepository
 import com.example.realestatemanager.data.contentprovider.EstateContentProviderWrapper
+import com.google.android.gms.maps.model.LatLng
 import java.io.IOException
 import java.net.InetSocketAddress
 import java.net.Socket
@@ -87,17 +90,40 @@ object Utils {
 
     fun extractCityFromAddress(address: String): String? {
         val pattern =
-            Regex("(\\d+)?\\s*([\\w\\s]+),\\s*(\\d{5})\\s*([\\w\\s]+),\\s*([\\w\\s]+)") // Expression régulière pour un format européen générique
+            Regex("(\\d+)?\\s*([\\w\\s]+),\\s*(\\d{5})\\s*([\\w\\s]+),\\s*([\\w\\s]+)")
 
         val matchResult = pattern.find(address)
         if (matchResult != null && matchResult.groups.size >= 5) {
-            return matchResult.groups[4]?.value?.trim() // Récupère le groupe correspondant à la ville et retire les espaces éventuels autour
+            return matchResult.groups[4]?.value?.trim()
         }
-        return null // Adresse invalide ou incomplète
+        return null
     }
 
     fun formatPriceNumber(price: Int): String {
         val dec = DecimalFormat("###,###,###,###,###")
         return dec.format(price)
+    }
+
+    fun getLocationFromAdress(address: String, context: Context, callBack: (LatLng?) -> Unit) {
+        val geocoder = Geocoder(context)
+        var latLng: LatLng?
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            geocoder.getFromLocationName(address, 1) {
+                if (it.isNotEmpty()) {
+                    latLng = LatLng(it[0].latitude, it[0].longitude)
+                } else {
+                    latLng = null
+                }
+                callBack(latLng)
+            }
+        } else {
+            val addresses: List<Address>? = geocoder.getFromLocationName(address, 1)
+            if (addresses?.isNotEmpty() == true) {
+                latLng = LatLng(addresses[0].latitude, addresses[0].longitude)
+            } else {
+                latLng = null
+            }
+            callBack(latLng)
+        }
     }
 }

@@ -14,12 +14,26 @@ import com.example.realestatemanager.model.EstateInterestPoint
 import com.example.realestatemanager.model.EstateModel
 import com.example.realestatemanager.ui.MainActivity.Companion.ARG_ESTATE_ID
 import com.example.realestatemanager.ui.adapter.EstatePictureDetailItemAdapter
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.MarkerOptions
+import com.openclassrooms.realestatemanager.Utils
 
-class EstateDetailFragment : Fragment() {
+
+class EstateDetailFragment : Fragment(), OnMapReadyCallback {
     private val viewModel: EstateDetailViewModel by viewModels()
     private val binding: FragmentEstateDetailBinding by lazy {
         FragmentEstateDetailBinding.inflate(layoutInflater)
     }
+    private var address: String? = null
+    private lateinit var map: GoogleMap
+    /*var locationPermissionRequest =
+        registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { _: Map<String, Boolean>? -> }*/
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -27,23 +41,27 @@ class EstateDetailFragment : Fragment() {
     ): View {
         super.onCreate(savedInstanceState)
         viewModel.initUi()
+
+        val mapView = binding.mapView
+        val supportMapFragment = SupportMapFragment.newInstance()
+        childFragmentManager.beginTransaction()
+            .replace(mapView.id, supportMapFragment)
+            .commit()
+        supportMapFragment.getMapAsync(this)
+
         viewModel.viewState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is EstateDetailState.InitialState -> showInitialState()
                 is EstateDetailState.LoadingState -> showLoadingState()
                 is EstateDetailState.WithEstateState -> showWithEstateState(state.estate)
-                is EstateDetailState.WithoutEstateState -> showWithoutEstateState()
             }
         }
         arguments?.getLong(ARG_ESTATE_ID)?.let { viewModel.getEstateDetail(it, requireContext()) }
         return binding.root
     }
 
-    private fun showWithoutEstateState() {
-        //TODO("Not yet implemented")
-    }
-
     private fun showWithEstateState(estate: EstateModel) {
+        address = estate.address
         binding.gallery.apply {
             val pictureAdapter = EstatePictureDetailItemAdapter()
             pictureAdapter.submitList(estate.pictures)
@@ -52,7 +70,7 @@ class EstateDetailFragment : Fragment() {
         }
         EstateInterestPoint.values().forEach { option ->
             val checkBox = CheckBox(requireContext())
-            checkBox.text = option.label.replace(" ","\n")
+            checkBox.text = option.label.replace(" ", "\n")
             checkBox.isChecked = false
             binding.interestPoints.addView(checkBox)
         }
@@ -81,11 +99,59 @@ class EstateDetailFragment : Fragment() {
     }
 
     private fun showInitialState() {
-        //TODO("Not yet implemented")
-    }
-
-    companion object {
-        const val ESTATE_DETAIL_FRAGMENT_KEY = "EstateDetailFragmentDestroyedKey"
 
     }
+
+    override fun onMapReady(googleMap: GoogleMap) {
+        map = googleMap
+        address?.let {
+
+            Utils.getLocationFromAdress(it, requireContext()) { location ->
+                if (location != null) {
+                    requireActivity().runOnUiThread {
+                        map.addMarker(MarkerOptions().position(location))
+                        map.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 17f))
+                        map.uiSettings.isScrollGesturesEnabled = false
+                        map.uiSettings.isZoomGesturesEnabled = false
+                    }
+                }
+            }
+        }
+    }
+    //TODO : code avec launcher de permission pour l'écran de map
+    /*map = googleMap
+    val fineLocationPermission = Manifest.permission.ACCESS_FINE_LOCATION
+    val coarseLocationPermission = Manifest.permission.ACCESS_COARSE_LOCATION
+
+    val permissionsGranted =
+        ActivityCompat.checkSelfPermission(
+            requireActivity(),
+            fineLocationPermission
+        ) == PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(
+                    requireActivity(),
+                    coarseLocationPermission
+                ) == PackageManager.PERMISSION_GRANTED
+
+    if (!permissionsGranted) {
+        locationPermissionRequest.launch(
+            arrayOf(
+                fineLocationPermission,
+                coarseLocationPermission
+            )
+        )
+    } else {
+        map.isMyLocationEnabled = true
+        val locationManager =
+            requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val lastKnownLocation =
+            locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+        lastKnownLocation?.let { location ->
+            val userLatLng = LatLng(location.latitude, location.longitude)
+            map.addMarker(MarkerOptions().position(userLatLng).title("Votre position"))
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 15f))
+        }
+    }*/
+
+
 }
