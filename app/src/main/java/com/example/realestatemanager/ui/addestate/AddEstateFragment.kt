@@ -23,6 +23,7 @@ import com.example.realestatemanager.model.EstateInterestPoint
 import com.example.realestatemanager.model.EstateModel
 import com.example.realestatemanager.model.EstateType
 import com.example.realestatemanager.ui.MainActivity.Companion.ARG_ESTATE_ID
+import com.example.realestatemanager.ui.SlidingPanelListener
 import com.example.realestatemanager.ui.adapter.EstatePictureItemAdapter
 
 class AddEstateFragment : Fragment() {
@@ -42,7 +43,6 @@ class AddEstateFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        super.onCreate(savedInstanceState)
         viewModel.initUi()
         viewModel.viewState.observe(requireActivity()) { state ->
             when (state) {
@@ -52,7 +52,7 @@ class AddEstateFragment : Fragment() {
                 is AddEstateState.WrongInputPrice -> showPriceWarning()
                 is AddEstateState.WrongInputSurface -> showSurfaceWarning()
                 is AddEstateState.PictureDescriptionMissingState -> showPictureDescriptionWarning()
-                is AddEstateState.EstateCreatedState -> showEstateCreatedState(state.message)
+                is AddEstateState.ToastMessageState -> showEstateCreatedState(state.message)
                 is AddEstateState.EstateDataState -> showEstateDataState(state.estate)
             }
         }
@@ -93,6 +93,7 @@ class AddEstateFragment : Fragment() {
         ).show()
         val fragmentManager = requireActivity().supportFragmentManager
         fragmentManager.beginTransaction().remove(this).commit()
+        (requireActivity() as SlidingPanelListener).closeSlidingPanel()
     }
 
     private fun showPictureDescriptionWarning() {

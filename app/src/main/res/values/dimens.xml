@@ -3,6 +3,7 @@
     <dimen name="fab_margin_medium">8dp</dimen>
     <dimen name="fab_margin_large">16dp</dimen>
     <dimen name="fab_margin_extra_large">32dp</dimen>
+    <dimen name="fab_margin_extra_extra_large">64dp</dimen>
 
     <dimen name="text_size_title">28sp</dimen>
     <dimen name="text_size_subtitle">22sp</dimen>

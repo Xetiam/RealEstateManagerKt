@@ -2,7 +2,6 @@ package com.example.realestatemanager.data.contentprovider
 
 import android.content.ContentResolver
 import android.content.ContentValues
-import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import android.provider.BaseColumns
@@ -13,10 +12,10 @@ import com.example.realestatemanager.model.EstateStatus
 import com.example.realestatemanager.model.EstateType
 import java.util.Date
 
-class EstateContentProviderWrapper(private val context: Context) : EstateRepository {
+class EstateContentProviderWrapper(private val contentResolver: ContentResolver) :
+    EstateRepository {
 
     override fun insertEstate(estate: EstateModel) {
-        val contentResolver: ContentResolver = context.contentResolver
         val contentValues = getContentValuesFromEstate(estate)
         contentResolver.insert(
             Uri.withAppendedPath(EstateContentProvider.BASE_CONTENT_URI, "estates"),
@@ -25,7 +24,6 @@ class EstateContentProviderWrapper(private val context: Context) : EstateReposit
     }
 
     override fun getAllEstates(): List<EstateModel> {
-        val contentResolver: ContentResolver = context.contentResolver
         val cursor = contentResolver.query(
             Uri.withAppendedPath(EstateContentProvider.BASE_CONTENT_URI, "estates"),
             null,
@@ -37,7 +35,6 @@ class EstateContentProviderWrapper(private val context: Context) : EstateReposit
     }
 
     override fun getEstateById(estateId: Long): EstateModel {
-        val contentResolver: ContentResolver = context.contentResolver
         val cursor = contentResolver.query(
             Uri.withAppendedPath(EstateContentProvider.BASE_CONTENT_URI, "estates/$estateId"),
             null,
@@ -49,7 +46,6 @@ class EstateContentProviderWrapper(private val context: Context) : EstateReposit
     }
 
     override fun updateEstate(estate: EstateModel) {
-        val contentResolver: ContentResolver = context.contentResolver
         val contentValues = getContentValuesFromEstate(estate)
         contentResolver.update(
             Uri.withAppendedPath(EstateContentProvider.BASE_CONTENT_URI, "estates/${estate.id}"),
@@ -142,12 +138,18 @@ class EstateContentProviderWrapper(private val context: Context) : EstateReposit
                 val startDate =
                     Date(it.getLong(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_START_DATE)))
                 var sellDate: Date? = null
-                if (Date(it.getLong(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_SELL_DATE))) != Date(0)) {
+                if (Date(it.getLong(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_SELL_DATE))) != Date(
+                        0
+                    )
+                ) {
                     sellDate =
                         Date(it.getLong(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_SELL_DATE)))
                 }
                 var modifyDate: Date? = null
-                if (Date(it.getLong(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_MODIFY_DATE))) != Date(0)) {
+                if (Date(it.getLong(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_MODIFY_DATE))) != Date(
+                        0
+                    )
+                ) {
                     modifyDate =
                         Date(it.getLong(it.getColumnIndexOrThrow(EstateContentProvider.EstateEntry.COLUMN_MODIFY_DATE)))
                 }

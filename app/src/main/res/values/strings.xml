@@ -46,4 +46,16 @@
     <string name="estate_detail_number_of_bathrooms">Number of bathrooms</string>
     <string name="estate_detail_number_of_bedrooms">Number of bedrooms</string>
     <string name="estate_detail_location">Location</string>
+    <string name="nav_open">Open</string>
+    <string name="nav_close">Close</string>
+    <string name="loan_simulator_initial_loan_amount">Initial Loan Amount :</string>
+    <string name="loan_simulator_annual_interest_rate">Annual interest rate :</string>
+    <string name="loan_simulator_loan_term_in_months">Loan term in months :</string>
+    <string name="simulate_loan_button_text">Simulate loan</string>
+    <string name="loan_simulator_result">Monthly payment : %s\nTotal cost : %s</string>
+    <string name="settings_price_dollar_currency_toggle">Price in dollars</string>
+    <string name="settings_price_euro_currency_toggle">Price in euro</string>
+    <string name="settings_agent_name">Agent Name :</string>
+    <string name="add_estate_no_agent_name">You don\'t have defined your name in settings</string>
+    <string name="settings_confirm_preference">Save settings</string>
 </resources>

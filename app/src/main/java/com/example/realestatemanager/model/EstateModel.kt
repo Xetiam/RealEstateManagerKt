@@ -12,7 +12,7 @@ data class EstateModel(
     val description: String,//done
     val pictures: ArrayList<Pair<Uri,String>>,//done
     val address: String,//done
-    val interestPoints: ArrayList<EstateInterestPoint>,//TODO
+    val interestPoints: ArrayList<EstateInterestPoint>,//done
     val status: EstateStatus,//done
     val startDate: Date,//auto
     val sellDate: Date? = null,//done

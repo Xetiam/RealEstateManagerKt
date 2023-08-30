@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="UtBotSettings">
+    <option name="runGeneratedTestsWithCoverage" value="true" />
+    <option name="sourceRootHistory">
+      <list>
+        <option value="E:\OpenClassroom\P9_Lepiller_Charly\RealEstateManagerKt\app\src\androidTest\java" />
+      </list>
+    </option>
+    <option name="testFramework" value="JUnit4" />
+  </component>
+</project>

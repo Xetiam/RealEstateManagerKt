@@ -13,9 +13,11 @@ import android.widget.CheckBox
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
+import androidx.core.view.GravityCompat
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -26,10 +28,15 @@ import com.example.realestatemanager.model.EstateInterestPoint
 import com.example.realestatemanager.model.EstateModel
 import com.example.realestatemanager.ui.addestate.AddEstateFragment
 import com.example.realestatemanager.ui.estatedetail.EstateDetailFragment
+import com.example.realestatemanager.ui.loansimulator.LoanSimulatorFragment
+import com.example.realestatemanager.ui.map.MapFragment
+import com.example.realestatemanager.ui.settings.SettingsFragment
+import com.google.android.material.navigation.NavigationView
 import com.google.android.material.slider.RangeSlider
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), SlidingPanelListener,
+    NavigationView.OnNavigationItemSelectedListener, CurrencyChangeListener, OnEstateClickListener  {
     private val viewModel: MainViewModel by viewModels()
     private val binding: ActivityMainBinding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private var estateIdCursor: Long? = null
@@ -79,6 +86,21 @@ class MainActivity : AppCompatActivity() {
             checkBox.isChecked = false
             binding.interestPoints.addView(checkBox)
         }
+        setDrawerMenu()
+    }
+
+    private fun setDrawerMenu() {
+        // Configurez un bouton ou une action pour ouvrir le tiroir de navigation
+        val actionBarDrawerToggle = ActionBarDrawerToggle(
+            this,
+            binding.drawerLayout,
+            R.string.nav_open,
+            R.string.nav_close
+        )
+        binding.drawerLayout.addDrawerListener(actionBarDrawerToggle)
+        actionBarDrawerToggle.syncState()
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        binding.navigationView.setNavigationItemSelectedListener(this)
     }
 
     private fun showSliderValuesState(
@@ -156,6 +178,7 @@ class MainActivity : AppCompatActivity() {
                     finish()
                 } else {
                     binding.slidingPaneLayout.closePane()
+                    viewModel.loadEstates(this@MainActivity)
                 }
             }
         })
@@ -166,7 +189,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showEstatesState(estates: List<EstateModel>) {
-        val adapter = EstateItemAdapter(estateIdCursor) {
+        val adapter = EstateItemAdapter(estateIdCursor, this) {
             viewModel.shouldShowDetailFragment(estateIdCursor == it)
             estateIdCursor = it
             viewModel.loadEstates(this)
@@ -231,7 +254,14 @@ class MainActivity : AppCompatActivity() {
                 })
                 true
             }
-
+            android.R.id.home -> {
+                if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    binding.drawerLayout.closeDrawer(GravityCompat.START)
+                } else {
+                    binding.drawerLayout.openDrawer(GravityCompat.START)
+                }
+                true
+            }
             else -> {
                 super.onOptionsItemSelected(item)
             }
@@ -250,7 +280,56 @@ class MainActivity : AppCompatActivity() {
         binding.slidingPaneLayout.openPane()
     }
 
+    override fun closeSlidingPanel() {
+        binding.slidingPaneLayout.closePane()
+        viewModel.loadEstates(this)
+    }
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.estate_map -> {
+                val fragment = MapFragment()
+                mainFragmentLauncher(fragment)
+            }
+            R.id.estate_loan -> {
+                val fragment = LoanSimulatorFragment()
+                mainFragmentLauncher(fragment)
+            }
+            R.id.estate_settings -> {
+                val fragment = SettingsFragment()
+                mainFragmentLauncher(fragment)
+            }
+        }
+        binding.drawerLayout.closeDrawer(GravityCompat.START)
+        return true
+    }
+
+    override fun onCurrencyChange() {
+        viewModel.loadEstates(this)
+    }
+
+    override fun onEstateClick(estateId: Long) {
+        estateIdCursor = estateId
+        viewModel.loadEstates(this)
+        val fragment = EstateDetailFragment()
+        fragment.arguments = Bundle().apply {
+            putLong(ARG_ESTATE_ID, estateId)
+        }
+        mainFragmentLauncher(fragment)
+    }
+
     companion object {
         const val ARG_ESTATE_ID = "estateId"
     }
+}
+interface SlidingPanelListener {
+    fun closeSlidingPanel()
+}
+
+interface CurrencyChangeListener {
+    fun onCurrencyChange()
+}
+
+interface OnEstateClickListener {
+    fun onEstateClick(estateId: Long)
 }

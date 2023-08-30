@@ -1,4 +1,4 @@
-package com.openclassrooms.realestatemanager
+package com.example.realestatemanager
 
 import android.content.Context
 import android.location.Address
@@ -10,12 +10,19 @@ import com.example.realestatemanager.data.EstateRepository
 import com.example.realestatemanager.data.contentprovider.EstateContentProviderWrapper
 import com.google.android.gms.maps.model.LatLng
 import java.io.IOException
+import java.lang.Math.atan2
+import java.lang.Math.cos
+import java.lang.Math.sin
+import java.lang.Math.sqrt
 import java.net.InetSocketAddress
 import java.net.Socket
 import java.text.DateFormat
 import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
+import kotlin.math.pow
 
 
 /**
@@ -34,7 +41,7 @@ object Utils {
     }
 
     fun convertEuroToDollar(dollars: Int): Int {
-        return Math.round(dollars * 1.11).toInt()
+        return Math.round(dollars * 1/0.901).toInt()
     }
 
     /**
@@ -78,9 +85,9 @@ object Utils {
     fun getEstateRepository(context: Context): EstateRepository =
         if (isInternetAvailable(context)) {
             //TODO : En attente du back
-            EstateContentProviderWrapper(context)
+            EstateContentProviderWrapper(context.contentResolver)
         } else {
-            EstateContentProviderWrapper(context)
+            EstateContentProviderWrapper(context.contentResolver)
         }
 
     fun isAddressValid(address: String): Boolean {
@@ -100,7 +107,8 @@ object Utils {
     }
 
     fun formatPriceNumber(price: Int): String {
-        val dec = DecimalFormat("###,###,###,###,###")
+        val symbols = DecimalFormatSymbols(Locale.US)
+        val dec = DecimalFormat("###,###,###,###,###", symbols)
         return dec.format(price)
     }
 
@@ -125,5 +133,25 @@ object Utils {
             }
             callBack(latLng)
         }
+    }
+
+    fun computeDistanceBetweenTwoPoints(
+        userLatLng: LatLng,
+        latLng: LatLng
+    ): Double {
+        val earthRadiusKm = 6371.0 // Rayon moyen de la Terre en kilomètres
+
+        val lat1 = userLatLng.latitude
+        val lon1 = userLatLng.longitude
+        val lat2 = latLng.latitude
+        val lon2 = latLng.longitude
+
+        val dLat = lat2 - lat1
+        val dLon = lon2 - lon1
+
+        val a = sin(dLat / 2).pow(2) + cos(lat1) * cos(lat2) * sin(dLon / 2).pow(2)
+        val c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+        return earthRadiusKm * c
     }
 }

@@ -11,5 +11,5 @@ sealed class AddEstateState : ViewState<Nothing>() {
     object WrongInputPrice : AddEstateState()
     object WrongInputSurface : AddEstateState()
     object PictureDescriptionMissingState : AddEstateState()
-    data class EstateCreatedState(val message: Int) : AddEstateState()
+    data class ToastMessageState(val message: Int) : AddEstateState()
 }

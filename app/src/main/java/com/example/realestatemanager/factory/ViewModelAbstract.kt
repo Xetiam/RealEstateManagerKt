@@ -14,5 +14,9 @@ abstract class ViewModelAbstract<State : ViewState<*>> : ViewModel() {
     protected fun setState(state: State) {
         _viewState.value = state
     }
+
+    protected fun postState(state: State) {
+        _viewState.postValue(state)
+    }
     abstract fun initUi()
 }

@@ -3,7 +3,6 @@ package com.example.realestatemanager.ui.estatedetail
 import android.content.Context
 import com.example.realestatemanager.data.EstateRepository
 import com.example.realestatemanager.factory.ViewModelAbstract
-import com.openclassrooms.realestatemanager.Utils
 
 class EstateDetailViewModel : ViewModelAbstract<EstateDetailState>() {
     private var estateRepository: EstateRepository? = null
@@ -12,7 +11,7 @@ class EstateDetailViewModel : ViewModelAbstract<EstateDetailState>() {
     }
 
     fun getEstateDetail(estateId: Long, context: Context) {
-        estateRepository = Utils.getEstateRepository(context)
+        estateRepository = com.example.realestatemanager.Utils.getEstateRepository(context)
         val estate = estateRepository?.getEstateById(estateId)
         if (estate != null) {
             setState(EstateDetailState.WithEstateState(estate))

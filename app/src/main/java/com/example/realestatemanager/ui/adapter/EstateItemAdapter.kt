@@ -1,3 +1,4 @@
+import android.content.Context
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -7,11 +8,16 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.realestatemanager.R
+import com.example.realestatemanager.Utils
 import com.example.realestatemanager.databinding.ItemEstateRecyclerBinding
 import com.example.realestatemanager.model.EstateModel
-import com.openclassrooms.realestatemanager.Utils
+import com.example.realestatemanager.ui.settings.SettingsFragment
 
-class EstateItemAdapter(private val selectedEstate: Long?, private val callback: (Long?) -> Unit) :
+class EstateItemAdapter(
+    private val selectedEstate: Long?,
+    private val context: Context,
+    private val callback: (Long?) -> Unit
+) :
     ListAdapter<EstateModel, EstateItemAdapter.EstateViewHolder>(EstateDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EstateViewHolder {
@@ -30,10 +36,20 @@ class EstateItemAdapter(private val selectedEstate: Long?, private val callback:
 
 
         fun bind(estate: EstateModel) {
+            val sharedPrefs =
+                context.getSharedPreferences(SettingsFragment.USER_PREFS, Context.MODE_PRIVATE)
+            val currency = sharedPrefs.getString(SettingsFragment.USER_CURRENCY, "USD")
+            var price: String
+            if (currency == "USD") {
+                price = "$${Utils.formatPriceNumber(estate.dollarPrice)}"
+            } else {
+                price =
+                    "${Utils.formatPriceNumber(Utils.convertDollarToEuro(estate.dollarPrice))} €"
+            }
             binding.apply {
                 estateType.text = estate.type.label
                 estateCity.text = Utils.extractCityFromAddress(estate.address)
-                estatePrice.text = "$${Utils.formatPriceNumber(estate.dollarPrice)}"
+                estatePrice.text = price
                 if (selectedEstate == estate.id) {
                     root.setCardBackgroundColor(
                         ContextCompat.getColor(root.context, R.color.purple_500)

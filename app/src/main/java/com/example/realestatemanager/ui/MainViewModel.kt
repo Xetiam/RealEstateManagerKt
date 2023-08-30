@@ -6,7 +6,7 @@ import com.example.realestatemanager.data.EstateRepository
 import com.example.realestatemanager.factory.ViewModelAbstract
 import com.example.realestatemanager.model.EstateInterestPoint
 import com.example.realestatemanager.model.EstateModel
-import com.openclassrooms.realestatemanager.Utils
+import com.example.realestatemanager.Utils
 import java.util.Calendar
 import java.util.Date
 
