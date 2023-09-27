@@ -72,10 +72,6 @@ class EstateContentProviderWrapper(private val contentResolver: ContentResolver)
             EstateContentProvider.EstateEntry.COLUMN_PICTURES_DESCRIPTION,
             (estate.pictures.map { it.second }).joinToString(",")
         )
-        contentValues.put(
-            EstateContentProvider.EstateEntry.COLUMN_PICTURES_DESCRIPTION,
-            (estate.pictures.map { it.second }).joinToString(",")
-        )
 
         contentValues.put(EstateContentProvider.EstateEntry.COLUMN_ADDRESS, estate.address)
         contentValues.put(

@@ -15,6 +15,17 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testOptions {
+            unitTests.all {
+                jvmArgs(
+                        "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+                        "--add-opens", "java.base/java.lang.reflect=ALL-UNNAMED"
+                )
+            }
+        }
+        useLibrary 'android.test.base'
+        useLibrary 'android.test.runner'
+        useLibrary 'android.test.mock'
     }
 
     buildTypes {
@@ -62,12 +73,14 @@ dependencies {
     // Image loading
     implementation 'com.github.bumptech.glide:glide:4.12.0'
     implementation 'androidx.test:core-ktx:1.5.0'
+    implementation 'androidx.test.ext:junit-ktx:1.1.5'
+    debugImplementation 'androidx.fragment:fragment-testing:1.6.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
 
     // Unit tests
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.mockito:mockito-core:4.7.0'
-    testImplementation "io.mockk:mockk:1.12.0"
+    testImplementation 'io.mockk:mockk:1.12.0'
     testImplementation 'androidx.arch.core:core-testing:2.1.0'
-    testImplementation 'org.robolectric:robolectric:4.6.1'
+    testImplementation 'org.robolectric:robolectric:4.7.3'
 }

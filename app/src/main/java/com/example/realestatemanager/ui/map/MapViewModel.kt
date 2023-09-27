@@ -29,13 +29,22 @@ class MapViewModel : ViewModelAbstract<MapState>() {
             )
         } else {
             buildPos(estates, context) { listPos: ArrayList<LatLng?> ->
+                val indexes = mutableListOf<Int>()
                 val itemsToKeep = listPos.filter {
-                    (it?.let { estateLatLng -> Utils.computeDistanceBetweenTwoPoints(userLatLng, estateLatLng) }
-                        ?: 101.0) <= 100.0
+                    if((it?.let { estateLatLng ->
+                            Utils.computeDistanceBetweenTwoPoints(userLatLng, estateLatLng) }
+                            ?: 101.0) <= 100.0){
+                        indexes.add(listPos.indexOf(it))
+                        true
+                    } else {
+                        false
+                    }
                 }
-                listPos.clear()
-                listPos.addAll(itemsToKeep)
-                postState(MapState.WithEstatesState(estates.zip(itemsToKeep)))
+                val estatesToKeep = mutableListOf<EstateModel>()
+                indexes.forEach {
+                    estatesToKeep.add(estates[it])
+                }
+                postState(MapState.WithEstatesState(estatesToKeep.zip(itemsToKeep)))
             }
         }
     }

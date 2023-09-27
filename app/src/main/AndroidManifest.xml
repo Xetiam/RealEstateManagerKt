@@ -27,6 +27,10 @@
             android:name=".data.contentprovider.EstateContentProvider"
             android:authorities="com.example.realestatemanager"
             android:exported="false" />
+        <provider
+            android:name=".data.contentprovider.EstateContentProvider"
+            android:authorities="com.example.realestatemanager.test"
+            android:exported="false" />
         <activity
             android:name=".ui.MainActivity"
             android:exported="true"

@@ -41,7 +41,7 @@ object Utils {
     }
 
     fun convertEuroToDollar(dollars: Int): Int {
-        return Math.round(dollars * 1/0.901).toInt()
+        return Math.round(dollars * 1 / 0.901).toInt()
     }
 
     /**
@@ -82,13 +82,14 @@ object Utils {
                 capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR))
     }
 
-    fun getEstateRepository(context: Context): EstateRepository =
-        if (isInternetAvailable(context)) {
+    fun getEstateRepository(context: Context): EstateRepository {
+        return if (isInternetAvailable(context)) {
             //TODO : En attente du back
             EstateContentProviderWrapper(context.contentResolver)
         } else {
             EstateContentProviderWrapper(context.contentResolver)
         }
+    }
 
     fun isAddressValid(address: String): Boolean {
         val pattern = Regex("(\\d+)?\\s*([\\w\\s]+),\\s*(\\d{5})\\s*([\\w\\s]+),\\s*([\\w\\s]+)")
@@ -114,25 +115,25 @@ object Utils {
 
     fun getLocationFromAdress(address: String, context: Context, callBack: (LatLng?) -> Unit) {
         val geocoder = Geocoder(context)
-        var latLng: LatLng?
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             geocoder.getFromLocationName(address, 1) {
-                if (it.isNotEmpty()) {
-                    latLng = LatLng(it[0].latitude, it[0].longitude)
-                } else {
-                    latLng = null
-                }
-                callBack(latLng)
+                sendResultLatLng(it, callBack)
+
             }
         } else {
             val addresses: List<Address>? = geocoder.getFromLocationName(address, 1)
-            if (addresses?.isNotEmpty() == true) {
-                latLng = LatLng(addresses[0].latitude, addresses[0].longitude)
-            } else {
-                latLng = null
-            }
-            callBack(latLng)
+            sendResultLatLng(addresses.orEmpty(), callBack)
         }
+    }
+
+    private fun sendResultLatLng(addresses: List<Address>, callBack: (LatLng?) -> Unit) {
+        var latLng: LatLng?
+        if (addresses.isNotEmpty()) {
+            latLng = LatLng(addresses[0].latitude, addresses[0].longitude)
+        } else {
+            latLng = null
+        }
+        callBack(latLng)
     }
 
     fun computeDistanceBetweenTwoPoints(

@@ -9,14 +9,12 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.net.Uri
-import android.os.Build
 import android.provider.BaseColumns
-import androidx.annotation.RequiresApi
 
 const val AUTHORITY = "com.example.realestatemanager"
 const val PATH_ESTATES = "estates"
 
-class EstateContentProvider : ContentProvider(){
+class EstateContentProvider : ContentProvider() {
     private lateinit var databaseHelper: SQLiteOpenHelper
 
     companion object {
@@ -31,10 +29,13 @@ class EstateContentProvider : ContentProvider(){
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(): Boolean {
-        databaseHelper = DatabaseHelper(requireContext())
-        return true
+        if (context != null) {
+            databaseHelper = DatabaseHelper(context!!)
+            return true
+        } else {
+            return false
+        }
     }
 
     override fun query(
@@ -171,7 +172,7 @@ class EstateContentProvider : ContentProvider(){
 
     private class DatabaseHelper(context: Context) : SQLiteOpenHelper(
         context,
-        "estate_database",
+        EstateEntry.TABLE_NAME,
         null,
         1
     ) {
@@ -199,69 +200,9 @@ class EstateContentProvider : ContentProvider(){
         }
 
         override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-            // You can handle database upgrades here
+            val dropTableQuery = "DROP TABLE IF EXISTS $EstateEntry.TABLE_NAME"
+            db.execSQL(dropTableQuery)
+            onCreate(db)
         }
     }
-/*
-    @RequiresApi(Build.VERSION_CODES.R)
-    override fun insertEstate(estate: EstateModel) {
-        val contentValues = ContentValues().apply {
-            put(EstateEntry.COLUMN_TYPE, estate.type.label)
-            put(EstateEntry.COLUMN_DOLLAR_PRICE, estate.dollarPrice)
-            put(EstateEntry.COLUMN_SURFACE, estate.surface)
-            put(EstateEntry.COLUMN_ROOMS, estate.rooms.first)
-            put(EstateEntry.COLUMN_BATHROOMS, estate.rooms.second)
-            put(EstateEntry.COLUMN_BEDROOMS, estate.rooms.third)
-            put(EstateEntry.COLUMN_DESCRIPTION, estate.description)
-            put(EstateEntry.COLUMN_PICTURES, estate.pictures.joinToString(","))
-            put(EstateEntry.COLUMN_ADDRESS, estate.address)
-            put(EstateEntry.COLUMN_INTEREST_POINTS, estate.interestPoints.joinToString(","))
-            put(EstateEntry.COLUMN_STATUS, estate.status)
-            put(EstateEntry.COLUMN_START_DATE, estate.startDate.time)
-            put(EstateEntry.COLUMN_SELL_DATE, estate.sellDate?.time)
-            put(EstateEntry.COLUMN_MODIFY_DATE, estate.modifyDate?.time)
-            put(EstateEntry.COLUMN_AGENT_NAME, estate.agentName)
-        }
-
-        requireContext().contentResolver.insert(BASE_CONTENT_URI.buildUpon().appendPath(PATH_ESTATES).build(), contentValues)
-    }
-
-    @RequiresApi(Build.VERSION_CODES.R)
-    override fun getAllEstates(): List<EstateModel> {
-        val estates = mutableListOf<EstateModel>()
-        val cursor = requireContext().contentResolver.query(BASE_CONTENT_URI.buildUpon().appendPath(PATH_ESTATES).build(), null, null, null, null)
-
-        cursor?.use {
-            while (it.moveToNext()) {
-                val id = it.getLong(it.getColumnIndexOrThrow(BaseColumns._ID))
-                val type = it.getString(it.getColumnIndexOrThrow(EstateEntry.COLUMN_TYPE))
-                val dollarPrice = it.getInt(it.getColumnIndexOrThrow(EstateEntry.COLUMN_DOLLAR_PRICE))
-                val surface = it.getInt(it.getColumnIndexOrThrow(EstateEntry.COLUMN_SURFACE))
-                val rooms = it.getInt(it.getColumnIndexOrThrow(EstateEntry.COLUMN_ROOMS))
-                val bathrooms = it.getInt(it.getColumnIndexOrThrow(EstateEntry.COLUMN_BATHROOMS))
-                val bedrooms = it.getInt(it.getColumnIndexOrThrow(EstateEntry.COLUMN_BEDROOMS))
-                val description = it.getString(it.getColumnIndexOrThrow(EstateEntry.COLUMN_DESCRIPTION))
-                val picturesString = it.getString(it.getColumnIndexOrThrow(EstateEntry.COLUMN_PICTURES))
-                val pictures = picturesString.split(",").map { uriString -> Uri.parse(uriString) }
-                val address = it.getString(it.getColumnIndexOrThrow(EstateEntry.COLUMN_ADDRESS))
-                val interestPointsString = it.getString(it.getColumnIndexOrThrow(EstateEntry.COLUMN_INTEREST_POINTS))
-                val interestPoints = interestPointsString.split(",")
-                val status = it.getString(it.getColumnIndexOrThrow(EstateEntry.COLUMN_STATUS))
-                val startDate = Date(it.getLong(it.getColumnIndexOrThrow(EstateEntry.COLUMN_START_DATE)))
-                val sellDate = Date(it.getLong(it.getColumnIndexOrThrow(EstateEntry.COLUMN_SELL_DATE)))
-                val modifyDate = Date(it.getLong(it.getColumnIndexOrThrow(EstateEntry.COLUMN_MODIFY_DATE)))
-                val agentName = it.getString(it.getColumnIndexOrThrow(EstateEntry.COLUMN_AGENT_NAME))
-
-                val estate = EstateModel(
-                    id,EstateType.fromLabel(type), dollarPrice, surface, Triple(rooms,bathrooms,bedrooms), description, pictures.toCollection(ArrayList()),
-                    address, interestPoints as ArrayList<String>, status,
-                    startDate, sellDate, modifyDate, agentName
-                )
-
-                estates.add(estate)
-            }
-        }
-
-        return estates
-    }*/
 }

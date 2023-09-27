@@ -48,12 +48,8 @@ class AddEstateViewModel :
             context.getSharedPreferences(SettingsFragment.USER_PREFS, Context.MODE_PRIVATE)
         val userName = sharedPrefs.getString(SettingsFragment.USER_NAME, "") ?: ""
         val currency = sharedPrefs.getString(SettingsFragment.USER_CURRENCY, "USD")
-        var finalPrice: String
-        if(currency== "USD") {
-            finalPrice = price
-        } else {
-            finalPrice = Utils.convertEuroToDollar(price.toInt()).toString()
-        }
+        val finalPrice: String
+
         val picturesWithDescription = pictures.zip(estatePictureDescriptions)
         if (Utils.isAddressValid(address) &&
             price.isNotEmpty() &&
@@ -61,6 +57,11 @@ class AddEstateViewModel :
             isDescriptionPictureComplete(pictures, picturesWithDescription) &&
             userName.isNotEmpty()
         ) {
+            if(currency == "USD") {
+                finalPrice = price
+            } else {
+                finalPrice = Utils.convertEuroToDollar(price.toInt()).toString()
+            }
             if (isModifying) {
                 estateRepository?.updateEstate(
                     EstateModel(
