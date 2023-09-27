@@ -24,7 +24,11 @@ import java.lang.reflect.Method
 import java.lang.reflect.Modifier
 import java.net.InetSocketAddress
 import java.net.Socket
+import kotlin.math.atan2
+import kotlin.math.cos
 import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 class UtilsTest {
 
@@ -299,8 +303,8 @@ class UtilsTest {
         val dLon = lon2 - lon1
 
         val a =
-            Math.sin(dLat / 2).pow(2) + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2).pow(2)
-        val c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+            sin(dLat / 2).pow(2) + cos(lat1) * cos(lat2) * sin(dLon / 2).pow(2)
+        val c = 2 * atan2(sqrt(a), sqrt(1 - a))
 
         return earthRadiusKm * c
     }

@@ -57,10 +57,10 @@ class AddEstateViewModel :
             isDescriptionPictureComplete(pictures, picturesWithDescription) &&
             userName.isNotEmpty()
         ) {
-            if(currency == "USD") {
-                finalPrice = price
+            finalPrice = if(currency == "USD") {
+                price
             } else {
-                finalPrice = Utils.convertEuroToDollar(price.toInt()).toString()
+                Utils.convertEuroToDollar(price.toInt()).toString()
             }
             if (isModifying) {
                 estateRepository?.updateEstate(
@@ -136,10 +136,10 @@ class AddEstateViewModel :
             estateRepository = Utils.getEstateRepository(context)
         }
         if (estateId != null && estateId != 0L) {
-            estateRepository?.getEstateById(estateId)?.let {
-                startDate = it.startDate
-                estatePictureDescriptions = it.pictures.map { it.second }.toMutableList()
-                setState(AddEstateState.EstateDataState(it))
+            estateRepository?.getEstateById(estateId)?.let { model ->
+                startDate = model.startDate
+                estatePictureDescriptions = model.pictures.map { it.second }.toMutableList()
+                setState(AddEstateState.EstateDataState(model))
             }
         }
     }

@@ -173,7 +173,7 @@ class EstateContentProviderWrapperTest {
         val mockUri4 = mockk<Uri>()
         every { mockUri4.toString() } returns "https://example.com/image4.jpg"
 
-        val fakeEstates = listOf(
+        return listOf(
             EstateModel(
                 id = 1L,
                 type = EstateType.FLAT,
@@ -216,6 +216,5 @@ class EstateContentProviderWrapperTest {
                 agentName = "Jane Smith"
             )
         )
-        return fakeEstates
     }
 }

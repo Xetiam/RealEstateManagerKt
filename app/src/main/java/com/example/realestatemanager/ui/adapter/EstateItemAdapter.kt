@@ -1,3 +1,5 @@
+package com.example.realestatemanager.ui.adapter
+
 import android.content.Context
 import android.net.Uri
 import android.view.LayoutInflater
@@ -39,12 +41,11 @@ class EstateItemAdapter(
             val sharedPrefs =
                 context.getSharedPreferences(SettingsFragment.USER_PREFS, Context.MODE_PRIVATE)
             val currency = sharedPrefs.getString(SettingsFragment.USER_CURRENCY, "USD")
-            var price: String
-            if (currency == "USD") {
-                price = "$${Utils.formatPriceNumber(estate.dollarPrice)}"
+            val price: String
+            price = if (currency == "USD") {
+                "$${Utils.formatPriceNumber(estate.dollarPrice)}"
             } else {
-                price =
-                    "${Utils.formatPriceNumber(Utils.convertDollarToEuro(estate.dollarPrice))} €"
+                "${Utils.formatPriceNumber(Utils.convertDollarToEuro(estate.dollarPrice))} €"
             }
             binding.apply {
                 estateType.text = estate.type.label

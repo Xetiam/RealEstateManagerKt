@@ -40,7 +40,7 @@ class LoanSimulatorFragment : Fragment() {
         return binding.root
     }
 
-    fun simulateMortgageLoan(
+    private fun simulateMortgageLoan(
         loanAmount: Double,
         annualInterestRate: Double,
         loanTermMonths: Int

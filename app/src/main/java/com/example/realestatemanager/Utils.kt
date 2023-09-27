@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import kotlin.math.pow
+import kotlin.math.roundToLong
 
 
 /**
@@ -37,11 +38,11 @@ object Utils {
      * @return
      */
     fun convertDollarToEuro(dollars: Int): Int {
-        return Math.round(dollars * 0.901).toInt()
+        return (dollars * 0.901).roundToLong().toInt()
     }
 
     fun convertEuroToDollar(dollars: Int): Int {
-        return Math.round(dollars * 1 / 0.901).toInt()
+        return (dollars * 1 / 0.901).roundToLong().toInt()
     }
 
     /**
@@ -52,7 +53,7 @@ object Utils {
      */
     val todayDate: String
         get() {
-            val dateFormat: DateFormat = SimpleDateFormat("dd/MM/yyyy")
+            val dateFormat: DateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.FRANCE)
             return dateFormat.format(Date())
         }
 
@@ -127,11 +128,11 @@ object Utils {
     }
 
     private fun sendResultLatLng(addresses: List<Address>, callBack: (LatLng?) -> Unit) {
-        var latLng: LatLng?
-        if (addresses.isNotEmpty()) {
-            latLng = LatLng(addresses[0].latitude, addresses[0].longitude)
+        val latLng: LatLng?
+        latLng = if (addresses.isNotEmpty()) {
+            LatLng(addresses[0].latitude, addresses[0].longitude)
         } else {
-            latLng = null
+            null
         }
         callBack(latLng)
     }
@@ -150,8 +151,10 @@ object Utils {
         val dLat = lat2 - lat1
         val dLon = lon2 - lon1
 
-        val a = sin(dLat / 2).pow(2) + cos(lat1) * cos(lat2) * sin(dLon / 2).pow(2)
-        val c = 2 * atan2(sqrt(a), sqrt(1 - a))
+        val a = kotlin.math.sin(dLat / 2).pow(2) + kotlin.math.cos(lat1) * kotlin.math.cos(lat2) * kotlin.math.sin(
+            dLon / 2
+        ).pow(2)
+        val c = 2 * kotlin.math.atan2(kotlin.math.sqrt(a), kotlin.math.sqrt(1 - a))
 
         return earthRadiusKm * c
     }

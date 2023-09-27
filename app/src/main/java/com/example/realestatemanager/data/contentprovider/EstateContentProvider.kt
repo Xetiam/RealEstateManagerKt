@@ -30,11 +30,11 @@ class EstateContentProvider : ContentProvider() {
     }
 
     override fun onCreate(): Boolean {
-        if (context != null) {
+        return if (context != null) {
             databaseHelper = DatabaseHelper(context!!)
-            return true
+            true
         } else {
-            return false
+            false
         }
     }
 
@@ -127,11 +127,11 @@ class EstateContentProvider : ContentProvider() {
     override fun delete(uri: Uri, selection: String?, selectionArgs: Array<out String>?): Int {
         val db = databaseHelper.writableDatabase
         val rowsDeleted: Int
-        when (uriMatcher.match(uri)) {
-            ESTATES -> rowsDeleted = db.delete(EstateEntry.TABLE_NAME, selection, selectionArgs)
+        rowsDeleted = when (uriMatcher.match(uri)) {
+            ESTATES -> db.delete(EstateEntry.TABLE_NAME, selection, selectionArgs)
             ESTATE_ID -> {
                 val id = ContentUris.parseId(uri)
-                rowsDeleted = db.delete(
+                db.delete(
                     EstateEntry.TABLE_NAME,
                     "${BaseColumns._ID} = ?",
                     arrayOf(id.toString())

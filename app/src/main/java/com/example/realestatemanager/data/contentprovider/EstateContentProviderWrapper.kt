@@ -76,7 +76,7 @@ class EstateContentProviderWrapper(private val contentResolver: ContentResolver)
         contentValues.put(EstateContentProvider.EstateEntry.COLUMN_ADDRESS, estate.address)
         contentValues.put(
             EstateContentProvider.EstateEntry.COLUMN_INTEREST_POINTS,
-            estate.interestPoints.map { it.label }.joinToString(",")
+            estate.interestPoints.joinToString(",") { it.label }
         )
         contentValues.put(EstateContentProvider.EstateEntry.COLUMN_STATUS, estate.status.label)
         contentValues.put(

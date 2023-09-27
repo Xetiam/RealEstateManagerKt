@@ -8,10 +8,6 @@
         since the 1500s, when an unknown printer took a galley of type and scrambled it to make a
         type specimen book"
     </string>
-    <string name="fab_content_description">Represents a view to invoke an action</string>
-    <string name="image_view_item_transform_content_description">Represents an image view in the
-        item
-    </string>
     <string name="add_estate_rooms_hint">Rooms number :</string>
     <string name="add_estate_bathrooms_hint">Bathrooms number :</string>
     <string name="add_estate_bedrooms_hint">Bedrooms number :</string>
@@ -26,12 +22,10 @@
     <string name="add_estate_picture_surface_warning">Veuillez entrer une surface en m² uniquement avec des caractère numérique</string>
     <string name="add_estate_picture_price_warning">Veuillez entrer un prix en $ uniquement avec des caractère numérique</string>
     <string name="add_estate_picture_address_warning">Veuillez entrer une adresse valide</string>
-    <string name="main_no_estate_message">Veuillez créer un bien immobilier ou connectez-vous pour accéder aux bien en ligne</string>
     <string name="menu_modify_estate">Modify an estate</string>
     <string name="menu_search_estate">Search estates</string>
     <string name="main_search_button">Apply filter</string>
     <string name="add_estate_picture_description">Picture description</string>
-    <string name="add_estate_permission_denied">We can not access to your phone data</string>
     <string name="add_estate_modification_success">Modification success !</string>
     <string name="add_estate_creation_success">Creation Success !</string>
     <string name="add_estate_sold_checkbox">Sold</string>
@@ -53,9 +47,9 @@
     <string name="loan_simulator_loan_term_in_months">Loan term in months :</string>
     <string name="simulate_loan_button_text">Simulate loan</string>
     <string name="loan_simulator_result">Monthly payment : %s\nTotal cost : %s</string>
-    <string name="settings_price_dollar_currency_toggle">Price in dollars</string>
-    <string name="settings_price_euro_currency_toggle">Price in euro</string>
     <string name="settings_agent_name">Agent Name :</string>
     <string name="add_estate_no_agent_name">You don\'t have defined your name in settings</string>
     <string name="settings_confirm_preference">Save settings</string>
+
+    <string name="content_description_picture">Estate Picture</string>
 </resources>

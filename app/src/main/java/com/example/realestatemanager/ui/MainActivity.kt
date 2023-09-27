@@ -1,7 +1,7 @@
 package com.example.realestatemanager.ui
 
-import EstateItemAdapter
-import NoEstateItemAdapter
+import com.example.realestatemanager.ui.adapter.EstateItemAdapter
+import com.example.realestatemanager.ui.adapter.NoEstateItemAdapter
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.READ_MEDIA_IMAGES
 import android.content.pm.PackageManager
@@ -185,7 +185,7 @@ class MainActivity : AppCompatActivity(), SlidingPanelListener,
     }
 
     private fun showLoadingState() {
-        // Afficher l'état de chargement dans l'activité
+        //TODO("Not yet implemented")
     }
 
     private fun showEstatesState(estates: List<EstateModel>) {

@@ -28,6 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
+            android:contentDescription="@string/content_description_picture"
             android:layout_margin="@dimen/fab_margin_medium"
             android:src="@drawable/baseline_add_24" />
 
@@ -96,14 +97,16 @@
             android:layout_width="match_parent"
             android:layout_height="80dp"
             android:hint="@string/add_estate_description_hint"
-            android:inputType="text" />
+            android:inputType="text"
+            android:autofillHints="" />
 
         <EditText
             android:id="@+id/address"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/add_estate_address_hint"
-            android:inputType="text" />
+            android:inputType="text"
+            android:autofillHints="" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -116,7 +119,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="@string/add_estate_price_hint"
-                android:inputType="number" />
+                android:inputType="number"
+                android:autofillHints="" />
 
             <EditText
                 android:id="@+id/surface"
@@ -124,7 +128,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="@string/add_estate_surface_hint"
-                android:inputType="number" />
+                android:inputType="number"
+                android:autofillHints="" />
         </LinearLayout>
         <TextView
             android:layout_width="wrap_content"

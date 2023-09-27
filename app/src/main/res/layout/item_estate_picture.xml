@@ -7,6 +7,7 @@
     <ImageView
         android:id="@+id/picture"
         android:layout_width="match_parent"
+        android:contentDescription="@string/content_description_picture"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:scaleType="fitCenter" />
@@ -15,7 +16,9 @@
         android:id="@+id/description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:inputType="text"
         android:layout_marginHorizontal="@dimen/fab_margin_extra_large"
         android:layout_marginVertical="@dimen/fab_margin_medium"
-        android:hint="@string/add_estate_picture_description" />
+        android:hint="@string/add_estate_picture_description"
+        android:autofillHints="" />
 </LinearLayout>

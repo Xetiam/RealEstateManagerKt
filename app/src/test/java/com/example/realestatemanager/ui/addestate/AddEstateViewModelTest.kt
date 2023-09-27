@@ -1,4 +1,4 @@
-package com.example.realestatemanager.ui
+package com.example.realestatemanager.ui.addestate
 
 import android.content.Context
 import android.net.Uri
@@ -10,8 +10,6 @@ import com.example.realestatemanager.model.EstateInterestPoint
 import com.example.realestatemanager.model.EstateModel
 import com.example.realestatemanager.model.EstateStatus
 import com.example.realestatemanager.model.EstateType
-import com.example.realestatemanager.ui.addestate.AddEstateState
-import com.example.realestatemanager.ui.addestate.AddEstateViewModel
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject

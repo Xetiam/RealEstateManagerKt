@@ -91,9 +91,7 @@ class EstateDetailFragment : Fragment(), OnMapReadyCallback {
         //TODO("Not yet implemented")
     }
 
-    private fun showInitialState() {
-
-    }
+    private fun showInitialState() = Unit
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap

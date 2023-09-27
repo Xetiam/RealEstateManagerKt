@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
@@ -57,7 +58,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun showWithoutEstateState(message: Int) {
-        //TODO("Not yet implemented")
+        Toast.makeText(
+            requireContext(),
+            getString(message),
+            Toast.LENGTH_LONG
+        ).show()
     }
 
     private fun showEstatesState(estates: List<Pair<EstateModel, LatLng?>>) {
